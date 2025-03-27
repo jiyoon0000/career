@@ -26,6 +26,8 @@ repositories {
 dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'io.github.cdimascio:java-dotenv:5.2.2'
+    implementation 'org.hibernate.validator:hibernate-validator:8.0.1.Final'
+    implementation 'jakarta.validation:jakarta.validation-api:3.0.2'
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
@@ -38,6 +40,8 @@ dependencies {
     runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.12.3'
     // spring security
     implementation 'org.springframework.boot:spring-boot-starter-security'
+    // BCrypt
+    implementation 'org.springframework.security:spring-security-crypto'
 
 }
 
