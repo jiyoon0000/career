@@ -64,7 +64,7 @@ public class MemberService {
         }
 
         jwtProvider.validateTokenOrThrow(accessToken);
-        
+
         long expiration = jwtProvider.getExpiration(accessToken);
         blacklistRedisTemplate.opsForValue().set(accessToken, "logout", expiration, TimeUnit.MILLISECONDS);
 
