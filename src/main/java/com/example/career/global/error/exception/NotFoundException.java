@@ -4,7 +4,11 @@ import com.example.career.global.error.errorcode.ErrorCode;
 
 public class NotFoundException extends CustomException {
 
-    public NotFoundException() {
-        super(ErrorCode.MEMBER_NOT_FOUND);
+    public NotFoundException(ErrorCode errorCode) {
+        super(errorCode);
+    }
+
+    public NotFoundException(ErrorCode errorCode, String message) {
+        super(errorCode, message);
     }
 }
