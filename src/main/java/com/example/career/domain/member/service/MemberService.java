@@ -11,9 +11,13 @@ import com.example.career.global.error.errorcode.ErrorCode;
 import com.example.career.global.error.exception.BadRequestException;
 import com.example.career.global.jwt.JwtProvider;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.concurrent.TimeUnit;
 
 @Service
 @RequiredArgsConstructor
@@ -22,6 +26,10 @@ public class MemberService {
     private final MemberRepository memberRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtProvider jwtProvider;
+
+    @Qualifier("stringRedisTemplate")
+    private final RedisTemplate<String, String> redisTemplate;
+    private final RedisTemplate<String, String> stringRedisTemplate;
 
     @Transactional
     public CommonResponseDto<String> signup(SignupRequestDto signupRequestDto) {
@@ -48,5 +56,17 @@ public class MemberService {
         String refreshToken = jwtProvider.generateRefreshToken(member.getEmail());
 
         return CommonResponseDto.success(SuccessCode.LOGIN_SUCCESS.getMessage(), new LoginResponseDto(accessToken, refreshToken));
+    }
+
+    @Transactional
+    public CommonResponseDto<String> logout(String accessToken) {
+        if (accessToken == null || !jwtProvider.validateTokenOrThrow(accessToken)) {
+            throw new BadRequestException(ErrorCode.INVALID_TOKEN);
+        }
+
+        long expiration = jwtProvider.getExpiration(accessToken);
+        stringRedisTemplate.opsForValue().set(accessToken, "logout", expiration, TimeUnit.MILLISECONDS);
+
+        return CommonResponseDto.success(SuccessCode.LOGIN_SUCCESS.getMessage(), "로그아웃 성공");
     }
 }

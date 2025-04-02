@@ -6,6 +6,7 @@ import com.example.career.domain.member.dto.SignupRequestDto;
 import com.example.career.domain.member.service.MemberService;
 import com.example.career.global.common.CommonResponseDto;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -30,5 +31,21 @@ public class MemberController {
     @PostMapping("/login")
     public ResponseEntity<CommonResponseDto<LoginResponseDto>> login(@Valid @RequestBody LoginRequestDto loginRequestDto) {
         return ResponseEntity.ok(memberService.login(loginRequestDto));
+    }
+
+    @PostMapping("/logout")
+    public ResponseEntity<CommonResponseDto<String>> logout(HttpServletRequest httpServletRequest) {
+        String token = resolveToken(httpServletRequest);
+        return ResponseEntity.ok(memberService.logout(token));
+    }
+
+    private String resolveToken(HttpServletRequest httpServletRequest) {
+        String bearer = httpServletRequest.getHeader("Authorization");
+
+        if (bearer != null && bearer.startsWith("Bearer ")) {
+            return bearer.substring(7);
+        }
+
+        return null;
     }
 }
