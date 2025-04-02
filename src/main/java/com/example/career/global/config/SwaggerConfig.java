@@ -28,11 +28,11 @@ public class SwaggerConfig {
                         .license(new License()
                                 .name("Career License")
                                 .url("배포 주소 추가 예정")))
-                .addSecurityItem(new SecurityRequirement().addList(SECURITY_SCHEME_NAME))
+                .addSecurityItem(new SecurityRequirement().addList("bearerAuth"))
                 .components(new Components()
-                        .addSecuritySchemes(SECURITY_SCHEME_NAME,
+                        .addSecuritySchemes("bearerAuth",
                                 new SecurityScheme()
-                                        .name(SECURITY_SCHEME_NAME)
+                                        .name("bearerAuth")
                                         .type(SecurityScheme.Type.HTTP)
                                         .scheme("bearer")
                                         .bearerFormat("JWT")));
