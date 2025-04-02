@@ -5,6 +5,7 @@ import com.example.career.domain.member.dto.LoginResponseDto;
 import com.example.career.domain.member.dto.SignupRequestDto;
 import com.example.career.domain.member.service.MemberService;
 import com.example.career.global.common.CommonResponseDto;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/auth")
+@Tag(name = "Auth", description = "회원 관련 API")
 public class MemberController {
 
     private final MemberService memberService;
