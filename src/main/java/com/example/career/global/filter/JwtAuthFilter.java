@@ -1,6 +1,12 @@
 package com.example.career.global.filter;
 
+import com.example.career.global.error.errorcode.ErrorCode;
+import com.example.career.global.error.exception.BadRequestException;
+import com.example.career.global.error.exception.UnAuthorizedException;
 import com.example.career.global.jwt.JwtProvider;
+import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.MalformedJwtException;
+import io.jsonwebtoken.UnsupportedJwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -29,12 +35,30 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
         String token = jwtProvider.resolveToken(httpServletRequest.getHeader(JwtProvider.AUTH_HEADER));
 
-        if (token != null && jwtProvider.validateToken(token)) {
-            String username = jwtProvider.getUsernameFromToken(token);
+        try {
+            if (token != null && jwtProvider.validateTokenOrThrow(token)) {
+                String username = jwtProvider.getUsernameFromToken(token);
 
-            UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(username, null, null);
+                UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(username, null, null);
 
-            SecurityContextHolder.getContext().setAuthentication(authenticationToken);
+                SecurityContextHolder.getContext().setAuthentication(authenticationToken);
+            }
+        } catch (ExpiredJwtException e) {
+            log.warn("Expired JWT token");
+            throw new UnAuthorizedException(ErrorCode.TOKEN_EXPIRED);
+        } catch (MalformedJwtException e) {
+            log.error("Invalid JWT format");
+            throw new BadRequestException(ErrorCode.INVALID_TOKEN);
+        } catch (UnsupportedJwtException e) {
+            log.error("Unsupported JWT token");
+            throw new BadRequestException(ErrorCode.INVALID_TOKEN);
+        } catch (IllegalArgumentException e) {
+            log.error("JWT token is empty or null");
+            throw new BadRequestException(ErrorCode.INVALID_TOKEN);
+        } catch (SecurityException e) {
+            log.error("JWT signature does not match");
+        } catch (Exception e) {
+            log.error("Failed to validate JWT token", e);
         }
 
         filterChain.doFilter(httpServletRequest, httpServletResponse);
