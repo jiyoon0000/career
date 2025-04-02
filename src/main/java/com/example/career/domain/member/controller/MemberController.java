@@ -1,5 +1,7 @@
 package com.example.career.domain.member.controller;
 
+import com.example.career.domain.member.dto.LoginRequestDto;
+import com.example.career.domain.member.dto.LoginResponseDto;
 import com.example.career.domain.member.dto.SignupRequestDto;
 import com.example.career.domain.member.service.MemberService;
 import com.example.career.global.common.CommonResponseDto;
@@ -21,5 +23,10 @@ public class MemberController {
     @PostMapping("/signup")
     public ResponseEntity<CommonResponseDto<String>> signup(@Valid @RequestBody SignupRequestDto signupRequestDto) {
         return ResponseEntity.ok(memberService.signup(signupRequestDto));
+    }
+
+    @PostMapping("/login")
+    public ResponseEntity<CommonResponseDto<LoginResponseDto>> login(@Valid @RequestBody LoginRequestDto loginRequestDto) {
+        return ResponseEntity.ok(memberService.login(loginRequestDto));
     }
 }
