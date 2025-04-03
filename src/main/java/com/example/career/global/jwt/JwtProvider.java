@@ -65,10 +65,15 @@ public class JwtProvider {
     }
 
     private Jws<Claims> getClaims(String token) {
-        return Jwts.parser()
-                .verifyWith(key)
-                .build()
-                .parseSignedClaims(token);
+        try {
+            return Jwts.parser()
+                    .verifyWith(key)
+                    .build()
+                    .parseSignedClaims(token);
+        } catch (Exception e) {
+            log.error("getClaims 실패: {}", e.getMessage());
+            throw e;
+        }
     }
 
     public String resolveToken(String bearerToken) {
@@ -83,8 +88,7 @@ public class JwtProvider {
         return expiration.getTime() - System.currentTimeMillis();
     }
 
-    public boolean validateTokenOrThrow(String token) {
+    public void validateTokenOrThrow(String token) {
         getClaims(token);
-        return false;
     }
 }

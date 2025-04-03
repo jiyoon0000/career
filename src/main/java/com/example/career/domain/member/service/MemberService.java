@@ -59,10 +59,12 @@ public class MemberService {
 
     @Transactional
     public CommonResponseDto<String> logout(String accessToken) {
-        if (accessToken == null || !jwtProvider.validateTokenOrThrow(accessToken)) {
+        if (accessToken == null) {
             throw new BadRequestException(ErrorCode.INVALID_TOKEN);
         }
 
+        jwtProvider.validateTokenOrThrow(accessToken);
+        
         long expiration = jwtProvider.getExpiration(accessToken);
         blacklistRedisTemplate.opsForValue().set(accessToken, "logout", expiration, TimeUnit.MILLISECONDS);
 
