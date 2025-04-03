@@ -15,8 +15,8 @@ public class RedisConfig {
         return new LettuceConnectionFactory();
     }
 
-    @Bean(name = "stringRedisTemplate")
-    public RedisTemplate<String, String> stringRedisTemplate(RedisConnectionFactory redisConnectionFactory) {
+    @Bean(name = "blacklistRedisTemplate")
+    public RedisTemplate<String, String> blacklistRedisTemplate(RedisConnectionFactory redisConnectionFactory) {
         RedisTemplate<String, String> redisTemplate = new RedisTemplate<>();
         redisTemplate.setConnectionFactory(redisConnectionFactory);
         redisTemplate.setKeySerializer(new StringRedisSerializer());

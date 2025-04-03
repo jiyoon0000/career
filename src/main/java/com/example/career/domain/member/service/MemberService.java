@@ -27,9 +27,8 @@ public class MemberService {
     private final PasswordEncoder passwordEncoder;
     private final JwtProvider jwtProvider;
 
-    @Qualifier("stringRedisTemplate")
-    private final RedisTemplate<String, String> redisTemplate;
-    private final RedisTemplate<String, String> stringRedisTemplate;
+    @Qualifier("blacklistRedisTemplate")
+    private final RedisTemplate<String, String> blacklistRedisTemplate;
 
     @Transactional
     public CommonResponseDto<String> signup(SignupRequestDto signupRequestDto) {
@@ -65,7 +64,7 @@ public class MemberService {
         }
 
         long expiration = jwtProvider.getExpiration(accessToken);
-        stringRedisTemplate.opsForValue().set(accessToken, "logout", expiration, TimeUnit.MILLISECONDS);
+        blacklistRedisTemplate.opsForValue().set(accessToken, "logout", expiration, TimeUnit.MILLISECONDS);
 
         return CommonResponseDto.success(SuccessCode.LOGIN_SUCCESS.getMessage(), "로그아웃 성공");
     }
