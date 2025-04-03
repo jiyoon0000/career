@@ -58,6 +58,10 @@ dependencies {
     // BCrypt
     implementation 'org.springframework.security:spring-security-crypto'
 
+    // Redis
+    implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+    implementation 'org.jetbrains:annotations:24.0.1'
+
 }
 
 tasks.named('test') {
