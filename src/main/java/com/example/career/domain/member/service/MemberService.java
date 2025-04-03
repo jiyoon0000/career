@@ -66,7 +66,7 @@ public class MemberService {
         long expiration = jwtProvider.getExpiration(accessToken);
         blacklistRedisTemplate.opsForValue().set(accessToken, "logout", expiration, TimeUnit.MILLISECONDS);
 
-        return CommonResponseDto.success(SuccessCode.LOGIN_SUCCESS.getMessage(), "로그아웃 성공");
+        return CommonResponseDto.success(SuccessCode.LOGOUT_SUCCESS.getMessage(), "로그아웃 성공");
     }
 
 }
