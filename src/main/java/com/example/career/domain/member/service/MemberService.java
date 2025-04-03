@@ -69,4 +69,5 @@ public class MemberService {
 
         return CommonResponseDto.success(SuccessCode.LOGIN_SUCCESS.getMessage(), "로그아웃 성공");
     }
+
 }
