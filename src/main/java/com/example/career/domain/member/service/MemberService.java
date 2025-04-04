@@ -41,7 +41,7 @@ public class MemberService {
         Member member = signupRequestDto.toEntity(encodedPassword);
         memberRepository.save(member);
 
-        return CommonResponseDto.success(SuccessCode.SIGNUP_SUCCESS.getMessage(), "회원가입 성공");
+        return CommonResponseDto.success(SuccessCode.SIGNUP_SUCCESS, null);
     }
 
     public CommonResponseDto<LoginResponseDto> login(LoginRequestDto loginRequestDto) {
@@ -55,7 +55,7 @@ public class MemberService {
         String accessToken = jwtProvider.generateAccessToken(member.getEmail());
         String refreshToken = jwtProvider.generateRefreshToken(member.getEmail());
 
-        return CommonResponseDto.success(SuccessCode.LOGIN_SUCCESS.getMessage(), new LoginResponseDto(accessToken, refreshToken));
+        return CommonResponseDto.success(SuccessCode.LOGIN_SUCCESS, new LoginResponseDto(accessToken, refreshToken));
     }
 
     @Transactional
@@ -69,7 +69,7 @@ public class MemberService {
         long expiration = jwtProvider.getExpiration(accessToken);
         blacklistRedisTemplate.opsForValue().set(accessToken, "logout", expiration, TimeUnit.MILLISECONDS);
 
-        return CommonResponseDto.success(SuccessCode.LOGOUT_SUCCESS.getMessage(), "로그아웃 성공");
+        return CommonResponseDto.success(SuccessCode.LOGOUT_SUCCESS, null);
     }
 
     public CommonResponseDto<String> changePassword(String token, ChangePasswordRequestDto changePasswordRequestDto) {
@@ -86,6 +86,6 @@ public class MemberService {
         String newEncodedPassword = passwordEncoder.encode(changePasswordRequestDto.getNewPassword());
         member.updatePassword(newEncodedPassword);
 
-        return CommonResponseDto.success(SuccessCode.PASSWORD_CHANGE_SUCCESS.getMessage(), "비밀번호 변경 성공");
+        return CommonResponseDto.success(SuccessCode.PASSWORD_CHANGE_SUCCESS, null);
     }
 }

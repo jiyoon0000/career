@@ -16,8 +16,14 @@ public class CommonResponseDto<T> {
         this.data = data;
     }
 
-    public static <T> CommonResponseDto<T> success(String message, T data) {
-        return new CommonResponseDto<>(HttpStatus.OK, message, data);
+    private CommonResponseDto(HttpStatus status, T data) {
+        this.status = status.value();
+        this.message = status.getReasonPhrase();
+        this.data = data;
+    }
+
+    public static <T> CommonResponseDto<T> success(SuccessCode successCode, T data) {
+        return new CommonResponseDto<>(HttpStatus.OK, successCode.getMessage(), data);
     }
 
     public static <T> CommonResponseDto<T> error(HttpStatus status, String message) {
