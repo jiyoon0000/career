@@ -88,4 +88,5 @@ public class MemberService {
 
         return CommonResponseDto.success(SuccessCode.PASSWORD_CHANGE_SUCCESS, null);
     }
+
 }
