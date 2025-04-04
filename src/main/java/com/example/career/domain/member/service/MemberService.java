@@ -88,4 +88,5 @@ public class MemberService {
 
         return CommonResponseDto.success(SuccessCode.PASSWORD_CHANGE_SUCCESS.getMessage(), "비밀번호 변경 성공");
     }
+
 }
