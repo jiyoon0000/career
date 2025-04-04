@@ -51,4 +51,7 @@ public class Member extends BaseEntity {
         this.gender = gender;
     }
 
+    public void updatePassword(String newEncodedPassword) {
+        this.password = newEncodedPassword;
+    }
 }
