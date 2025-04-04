@@ -1,5 +1,6 @@
 package com.example.career.domain.member.service;
 
+import com.example.career.domain.member.dto.ChangePasswordRequestDto;
 import com.example.career.domain.member.dto.LoginRequestDto;
 import com.example.career.domain.member.dto.LoginResponseDto;
 import com.example.career.domain.member.dto.SignupRequestDto;
@@ -71,4 +72,20 @@ public class MemberService {
         return CommonResponseDto.success(SuccessCode.LOGOUT_SUCCESS.getMessage(), "로그아웃 성공");
     }
 
+    public CommonResponseDto<String> changePassword(String token, ChangePasswordRequestDto changePasswordRequestDto) {
+
+        String email = jwtProvider.getUsernameFromToken(token);
+
+        Member member = memberRepository.findByEmail(email)
+                .orElseThrow(() -> new BadRequestException(ErrorCode.MEMBER_NOT_FOUND));
+
+        if (!passwordEncoder.matches(changePasswordRequestDto.getCurrentPassword(), member.getPassword())) {
+            throw new BadRequestException(ErrorCode.INVALID_PASSWORD);
+        }
+
+        String newEncodedPassword = passwordEncoder.encode(changePasswordRequestDto.getNewPassword());
+        member.updatePassword(newEncodedPassword);
+
+        return CommonResponseDto.success(SuccessCode.PASSWORD_CHANGE_SUCCESS.getMessage(), "비밀번호 변경 성공");
+    }
 }

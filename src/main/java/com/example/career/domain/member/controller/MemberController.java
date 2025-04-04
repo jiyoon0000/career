@@ -1,5 +1,6 @@
 package com.example.career.domain.member.controller;
 
+import com.example.career.domain.member.dto.ChangePasswordRequestDto;
 import com.example.career.domain.member.dto.LoginRequestDto;
 import com.example.career.domain.member.dto.LoginResponseDto;
 import com.example.career.domain.member.dto.SignupRequestDto;
@@ -11,6 +12,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -51,6 +53,14 @@ public class MemberController {
         }
 
         return null;
+    }
+
+    @PatchMapping("/password")
+    public ResponseEntity<CommonResponseDto<String>> changePassword(HttpServletRequest httpServletRequest,
+                                                                    @Valid @RequestBody ChangePasswordRequestDto changePasswordRequestDto) {
+        String token = resolveToken(httpServletRequest);
+
+        return ResponseEntity.ok(memberService.changePassword(token, changePasswordRequestDto));
     }
 
 }
