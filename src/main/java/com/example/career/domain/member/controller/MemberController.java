@@ -62,3 +62,4 @@ public class MemberController {
 
         return ResponseEntity.ok(memberService.changePassword(token, changePasswordRequestDto));
     }
+}
