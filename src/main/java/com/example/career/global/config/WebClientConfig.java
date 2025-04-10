@@ -11,13 +11,13 @@ import org.springframework.web.reactive.function.client.WebClient;
 public class WebClientConfig {
 
     @Value("${external.job-api.base-url}")
-    private String baseUrl;
+    private String jobDictionaryBaseUrl;
 
     @Bean
     public WebClient jobWebClient() {
         return WebClient.builder()
-                .baseUrl(baseUrl)
-                .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+                .baseUrl(jobDictionaryBaseUrl)
+                .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_XML_VALUE)
                 .build();
     }
 
