@@ -1,7 +1,7 @@
 package com.example.career.domain.member.entity;
 
 import com.example.career.domain.member.enums.Gender;
-import com.example.career.global.common.BaseEntity;
+import com.example.career.global.common.SoftDeletableEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -17,7 +17,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor
 @Table(name = "members")
-public class Member extends BaseEntity {
+public class Member extends SoftDeletableEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
