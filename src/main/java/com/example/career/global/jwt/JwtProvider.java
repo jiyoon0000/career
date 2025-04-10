@@ -40,20 +40,20 @@ public class JwtProvider {
         this.refreshTokenExpiry = refreshTokenExpiry;
     }
 
-    public String generateAccessToken(String username) {
-        return generateToken(username, accessTokenExpiry);
+    public String generateAccessToken(String email) {
+        return generateToken(email, accessTokenExpiry);
     }
 
-    public String generateRefreshToken(String username) {
-        return generateToken(username, refreshTokenExpiry);
+    public String generateRefreshToken(String email) {
+        return generateToken(email, refreshTokenExpiry);
     }
 
-    private String generateToken(String username, long expiryTime) {
+    private String generateToken(String email, long expiryTime) {
         Date now = new Date();
         Date expiry = new Date(now.getTime() + expiryTime);
 
         return Jwts.builder()
-                .subject(username)
+                .subject(email)
                 .issuedAt(now)
                 .expiration(expiry)
                 .signWith(key)
