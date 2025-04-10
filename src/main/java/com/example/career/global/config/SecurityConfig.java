@@ -1,5 +1,6 @@
 package com.example.career.global.config;
 
+import com.example.career.domain.member.repository.MemberRepository;
 import com.example.career.global.filter.JwtAuthFilter;
 import com.example.career.global.jwt.JwtProvider;
 import lombok.RequiredArgsConstructor;
@@ -20,6 +21,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class SecurityConfig {
 
     private final JwtProvider jwtProvider;
+    private final MemberRepository memberRepository;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
@@ -37,7 +39,7 @@ public class SecurityConfig {
                         ).permitAll()
                         .anyRequest().authenticated()
                 )
-                .addFilterBefore(new JwtAuthFilter(jwtProvider), UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(new JwtAuthFilter(jwtProvider, memberRepository), UsernamePasswordAuthenticationFilter.class)
                 .build();
     }
 

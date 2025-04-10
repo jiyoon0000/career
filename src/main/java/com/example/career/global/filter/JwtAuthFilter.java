@@ -1,9 +1,12 @@
 package com.example.career.global.filter;
 
+import com.example.career.domain.member.entity.Member;
+import com.example.career.domain.member.repository.MemberRepository;
 import com.example.career.global.error.errorcode.ErrorCode;
 import com.example.career.global.error.exception.BadRequestException;
 import com.example.career.global.error.exception.UnAuthorizedException;
 import com.example.career.global.jwt.JwtProvider;
+import com.example.career.global.security.MemberDetails;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.UnsupportedJwtException;
@@ -26,6 +29,7 @@ import java.io.IOException;
 public class JwtAuthFilter extends OncePerRequestFilter {
 
     private final JwtProvider jwtProvider;
+    private final MemberRepository memberRepository;
 
     @Override
     protected void doFilterInternal(HttpServletRequest httpServletRequest,
@@ -37,9 +41,15 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
         try {
             if (token != null) {
-                String username = jwtProvider.getUsernameFromToken(token);
+                jwtProvider.validateTokenOrThrow(token);
+                String email = jwtProvider.getUsernameFromToken(token);
 
-                UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(username, null, null);
+                Member member = memberRepository.findByEmail(email)
+                        .orElseThrow(() -> new UnAuthorizedException(ErrorCode.MEMBER_NOT_FOUND));
+
+                MemberDetails memberDetails = new MemberDetails(member);
+
+                UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(memberDetails, null, memberDetails.getAuthorities());
 
                 SecurityContextHolder.getContext().setAuthentication(authenticationToken);
             }
