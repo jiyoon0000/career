@@ -7,10 +7,12 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Getter
 @Table(name = "jobs")
+@NoArgsConstructor
 public class Job extends BaseEntity {
 
     @Id
@@ -20,4 +22,9 @@ public class Job extends BaseEntity {
     private String name;
 
     private String code;
+
+    public Job(String name, String code) {
+        this.name = name;
+        this.code = code;
+    }
 }
