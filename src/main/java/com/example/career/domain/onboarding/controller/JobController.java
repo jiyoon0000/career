@@ -28,7 +28,7 @@ public class JobController {
     @GetMapping("jobs/search")
     @Operation(summary = "직업 검색", description = "고용24 API를 통해 직업명 검색")
     public ResponseEntity<CommonResponseDto<List<JobItemResponseDto>>> searchJobs(@RequestParam String keyword,
-                                                                                  @AuthenticationPrincipal MemberDetails member) {
+                                                                                  @AuthenticationPrincipal MemberDetails user) {
         List<JobItemResponseDto> jobs = jobService.searchJobs(keyword);
 
         return ResponseEntity.ok(CommonResponseDto.success(SuccessCode.FETCH_SUCCESS, jobs));
