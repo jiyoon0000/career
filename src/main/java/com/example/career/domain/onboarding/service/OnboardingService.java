@@ -22,15 +22,27 @@ public class OnboardingService {
 
     @Transactional
     public JobSelectionResponseDto saveJobSelection(MemberDetails user, JobSelectionRequestDto jobSelectionRequestDto) {
-        Long memberId = user.getMember().getId();
 
-        Member member = memberRepository.findById(memberId)
+        Member member = memberRepository.findById(user.getMember().getId())
                 .orElseThrow(() -> new BadRequestException(ErrorCode.MEMBER_NOT_FOUND));
 
         Job job = jobRepository.findByCode(jobSelectionRequestDto.getJobCode())
                 .orElseThrow(() -> new BadRequestException(ErrorCode.JOB_NOT_FOUND));
 
         member.selectJob(job);
+
+        return new JobSelectionResponseDto(job.getCode(), job.getName());
+    }
+
+    public JobSelectionResponseDto getSelectedJob(MemberDetails user) {
+        Member member = memberRepository.findById(user.getMember().getId())
+                .orElseThrow(() -> new BadRequestException(ErrorCode.MEMBER_NOT_FOUND));
+
+        Job job = member.getJob();
+
+        if (job == null) {
+            throw new BadRequestException(ErrorCode.JOB_NOT_SELECTED);
+        }
 
         return new JobSelectionResponseDto(job.getCode(), job.getName());
     }

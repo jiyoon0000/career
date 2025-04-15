@@ -12,6 +12,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -32,5 +33,13 @@ public class OnboardingController {
         JobSelectionResponseDto jobSelectionResponseDto = onboardingService.saveJobSelection(user, jobSelectionRequestDto);
 
         return ResponseEntity.ok(CommonResponseDto.success(SuccessCode.CREATE_SUCCESS, jobSelectionResponseDto));
+    }
+
+    @GetMapping("/jobs/selected")
+    @Operation(summary = "선택한 직무 조회", description = "회원이 선택한 직무 조회")
+    public ResponseEntity<CommonResponseDto<JobSelectionResponseDto>> getSelectedJob(@AuthenticationPrincipal MemberDetails user) {
+        JobSelectionResponseDto jobSelectionResponseDto = onboardingService.getSelectedJob(user);
+
+        return ResponseEntity.ok(CommonResponseDto.success(SuccessCode.FETCH_SUCCESS, jobSelectionResponseDto));
     }
 }
