@@ -68,6 +68,10 @@ dependencies {
     // xml module
     implementation 'com.fasterxml.jackson.dataformat:jackson-dataformat-xml'
 
+    // Open AI API
+    implementation 'org.springframework.ai:spring-ai-openai-spring-boot-starter'
+    implementation 'org.springframework.ai:spring-ai-openai'
+
 }
 
 tasks.named('test') {
