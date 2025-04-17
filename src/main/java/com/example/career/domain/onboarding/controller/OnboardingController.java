@@ -3,6 +3,7 @@ package com.example.career.domain.onboarding.controller;
 import com.example.career.domain.onboarding.dto.JobSelectionRequestDto;
 import com.example.career.domain.onboarding.dto.JobSelectionResponseDto;
 import com.example.career.domain.onboarding.dto.SkillRecommendResponseDto;
+import com.example.career.domain.onboarding.dto.SkillSelectionRequestDto;
 import com.example.career.domain.onboarding.service.AiService;
 import com.example.career.domain.onboarding.service.OnboardingService;
 import com.example.career.global.common.CommonResponseDto;
@@ -54,5 +55,14 @@ public class OnboardingController {
         List<SkillRecommendResponseDto> skills = aiService.recommendSkills(user);
 
         return ResponseEntity.ok(CommonResponseDto.success(SuccessCode.FETCH_SUCCESS, skills));
+    }
+
+    @PostMapping("/skills")
+    @Operation(summary = "선택 스킬 저장", description = "사용자가 선택한 스킬을 저장(최소 1개 ~ 최대 10개")
+    public ResponseEntity<CommonResponseDto<String>> saveSkills(@AuthenticationPrincipal MemberDetails user,
+                                                                @RequestBody @Valid SkillSelectionRequestDto skillSelectionRequestDto) {
+        onboardingService.saveSkillSelection(user, skillSelectionRequestDto);
+
+        return ResponseEntity.ok(CommonResponseDto.success(SuccessCode.CREATE_SUCCESS, null));
     }
 }
