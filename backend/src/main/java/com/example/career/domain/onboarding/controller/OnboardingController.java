@@ -1,8 +1,10 @@
 package com.example.career.domain.onboarding.controller;
 
 import com.example.career.domain.onboarding.dto.CertificateResponseDto;
+import com.example.career.domain.onboarding.dto.CertificateSelectionRequestDto;
 import com.example.career.domain.onboarding.dto.JobSelectionRequestDto;
 import com.example.career.domain.onboarding.dto.JobSelectionResponseDto;
+import com.example.career.domain.onboarding.dto.OnboardingCompletionResponseDto;
 import com.example.career.domain.onboarding.dto.SkillRecommendResponseDto;
 import com.example.career.domain.onboarding.dto.SkillSelectionRequestDto;
 import com.example.career.domain.onboarding.service.AiService;
@@ -84,5 +86,24 @@ public class OnboardingController {
         List<CertificateResponseDto> certificates = certificateFetchService.fetchAndSaveCertificates(jobCode);
 
         return ResponseEntity.ok(CommonResponseDto.success(SuccessCode.FETCH_SUCCESS, certificates));
+    }
+
+    @PostMapping("/certificates")
+    @Operation(summary = "자격증 선택 저장", description = "사용자가 선택한 자격증을 저장")
+    public ResponseEntity<CommonResponseDto<Void>> saveSelectedCertificates(@AuthenticationPrincipal MemberDetails user,
+                                                                            @RequestBody @Valid CertificateSelectionRequestDto certificateSelectionRequestDto) {
+
+        onboardingService.saveSelectedCertificates(user, certificateSelectionRequestDto.getCertificateNames());
+
+        return ResponseEntity.ok(CommonResponseDto.success(SuccessCode.CREATE_SUCCESS, null));
+    }
+
+    @GetMapping("/completed")
+    @Operation(summary = "온보딩 완료 여부 조회", description = "직무, 스킬, 자격증(추천이 된 경우) 선택 여부를 바탕으로 온보딩 완료 여부를 반환")
+    public ResponseEntity<CommonResponseDto<OnboardingCompletionResponseDto>> checkOnboardingCompleted(@AuthenticationPrincipal MemberDetails user) {
+
+        OnboardingCompletionResponseDto result = onboardingService.isOnboardingCompleted(user);
+
+        return ResponseEntity.ok(CommonResponseDto.success(SuccessCode.FETCH_SUCCESS, result));
     }
 }

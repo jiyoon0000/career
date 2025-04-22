@@ -26,6 +26,17 @@ public class CertificateFetchService {
     private final JobRepository jobRepository;
 
     public List<CertificateResponseDto> fetchAndSaveCertificates(String jobCode) {
+
+        Job job = jobRepository.findByCode(jobCode)
+                .orElseThrow(() -> new NotFoundException(ErrorCode.JOB_NOT_FOUND));
+
+        List<Certificate> existingCertificates = certificateRepository.findAllByJob(job);
+        if (!existingCertificates.isEmpty()) {
+            return existingCertificates.stream()
+                    .map(cert -> new CertificateResponseDto(cert.getName()))
+                    .toList();
+        }
+
         String xml = certApiClient.getCertificatesByJobCode(jobCode).block();
 
         if (xml == null || xml.isBlank()) {
@@ -37,9 +48,6 @@ public class CertificateFetchService {
         if (jobDetailCertificateResponseDto.getRelCertList() == null || jobDetailCertificateResponseDto.getRelCertList().isEmpty()) {
             return List.of();
         }
-
-        Job job = jobRepository.findByCode(jobCode)
-                .orElseThrow(() -> new NotFoundException(ErrorCode.JOB_NOT_FOUND));
 
         List<CertificateResponseDto> savedCerts = new ArrayList<>();
         for (JobDetailCertificateResponseDto.CertItem item : jobDetailCertificateResponseDto.getRelCertList()) {
