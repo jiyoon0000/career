@@ -10,5 +10,5 @@ public interface MemberCertificateRepository extends JpaRepository<MemberCertifi
 
     List<MemberCertificate> findByMember(Member member);
 
-    void deleteByMember(Member member);
+    void deleteAllByMember(Long memberId);
 }

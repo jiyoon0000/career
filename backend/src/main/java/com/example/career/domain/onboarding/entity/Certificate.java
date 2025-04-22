@@ -10,9 +10,11 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Getter
+@NoArgsConstructor
 @Table(name = "certificates")
 public class Certificate extends BaseEntity {
 
@@ -25,4 +27,9 @@ public class Certificate extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "job_id")
     private Job job;
+
+    public Certificate(String name, Job job) {
+        this.name = name;
+        this.job = job;
+    }
 }
