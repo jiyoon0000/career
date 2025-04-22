@@ -8,13 +8,13 @@ import lombok.NoArgsConstructor;
 
 import java.util.List;
 
-@JacksonXmlRootElement(localName = "dJobDtl")
+@JacksonXmlRootElement(localName = "way")
 @Getter
 @NoArgsConstructor
 public class JobDetailCertificateResponseDto {
 
-    @JacksonXmlProperty(localName = "relCert")
-    @JacksonXmlElementWrapper(localName = "relCertList")
+    @JacksonXmlProperty(localName = "relCertList")
+    @JacksonXmlElementWrapper(useWrapping = false, localName = "relCertList")
     private List<CertItem> relCertList;
 
     @Getter
