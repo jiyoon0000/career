@@ -27,7 +27,7 @@ public class WebClientConfig {
     @Bean("certWebClient")
     public WebClient certWebClient() {
         return WebClient.builder()
-                .baseUrl(jobDictionaryBaseUrl)
+                .baseUrl(certApiBaseUrl)
                 .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_XML_VALUE)
                 .build();
     }

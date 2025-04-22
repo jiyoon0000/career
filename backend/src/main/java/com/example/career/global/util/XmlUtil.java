@@ -13,7 +13,7 @@ public class XmlUtil {
 
     public static <T> T fromXml(String xml, Class<T> valueType) {
         try {
-//            xml = xml.replaceAll("<script.*?>.*?</script>", "").replaceAll("<script/>", "");
+            xml = xml.replaceAll("<script.*?>.*?</script>", "").replaceAll("<script/>", "");
 
             return xmlMapper.readValue(xml, valueType);
         } catch (JsonProcessingException e) {
