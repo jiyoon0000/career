@@ -9,24 +9,23 @@ import reactor.core.publisher.Mono;
 
 @Component
 @RequiredArgsConstructor
-public class JobApiClient {
+public class CertApiClient {
 
-    @Qualifier("jobWebClient")
+    @Qualifier("certWebClient")
     private final WebClient webClient;
 
     @Value("${external.work24-api.service-key}")
     private String authKey;
 
-    public Mono<String> getJobs(String keyword) {
+    public Mono<String> getCertificatesByJobCode(String jobCode) {
         return webClient.get()
                 .uri(uriBuilder -> uriBuilder
                         .queryParam("authKey", authKey)
                         .queryParam("returnType", "XML")
-                        .queryParam("target", "dJobCD")
-                        .queryParam("srchType", "K")
-                        .queryParam("keyword", keyword)
-                        .queryParam("startPage", 1)
-                        .queryParam("display", 50)
+                        .queryParam("target", "JOBDTL")
+                        .queryParam("jobGb", "1")
+                        .queryParam("jobCd", jobCode)
+                        .queryParam("dtlGb", "3")
                         .build()
                 )
                 .retrieve()
