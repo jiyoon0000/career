@@ -8,7 +8,9 @@ import java.util.List;
 
 public interface CertificateRepository extends JpaRepository<Certificate, Long> {
 
-    List<Certificate> findByJobCode(String jobCode);
-
     boolean existsByNameAndJob(String name, Job job);
+
+    List<Certificate> findAllByNameIn(List<String> certificateNames);
+
+    List<Certificate> findAllByJob(Job job);
 }

@@ -1,6 +1,7 @@
 package com.example.career.domain.onboarding.controller;
 
 import com.example.career.domain.onboarding.dto.CertificateResponseDto;
+import com.example.career.domain.onboarding.dto.CertificateSelectionRequestDto;
 import com.example.career.domain.onboarding.dto.JobSelectionRequestDto;
 import com.example.career.domain.onboarding.dto.JobSelectionResponseDto;
 import com.example.career.domain.onboarding.dto.SkillRecommendResponseDto;
@@ -84,5 +85,15 @@ public class OnboardingController {
         List<CertificateResponseDto> certificates = certificateFetchService.fetchAndSaveCertificates(jobCode);
 
         return ResponseEntity.ok(CommonResponseDto.success(SuccessCode.FETCH_SUCCESS, certificates));
+    }
+
+    @PostMapping("/certificates")
+    @Operation(summary = "자격증 선택 저장", description = "사용자가 선택한 자격증을 저장")
+    public ResponseEntity<CommonResponseDto<Void>> saveSelectedCertificates(@AuthenticationPrincipal MemberDetails user,
+                                                                            @RequestBody @Valid CertificateSelectionRequestDto certificateSelectionRequestDto){
+
+        onboardingService.saveSelectedCertificates(user, certificateSelectionRequestDto.getCertificateNames());
+
+        return ResponseEntity.ok(CommonResponseDto.success(SuccessCode.CREATE_SUCCESS, null));
     }
 }

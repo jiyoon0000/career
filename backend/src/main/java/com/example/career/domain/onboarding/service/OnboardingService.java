@@ -5,9 +5,13 @@ import com.example.career.domain.member.repository.MemberRepository;
 import com.example.career.domain.onboarding.dto.JobSelectionRequestDto;
 import com.example.career.domain.onboarding.dto.JobSelectionResponseDto;
 import com.example.career.domain.onboarding.dto.SkillSelectionRequestDto;
+import com.example.career.domain.onboarding.entity.Certificate;
 import com.example.career.domain.onboarding.entity.Job;
+import com.example.career.domain.onboarding.entity.MemberCertificate;
 import com.example.career.domain.onboarding.entity.MemberSkill;
+import com.example.career.domain.onboarding.repository.CertificateRepository;
 import com.example.career.domain.onboarding.repository.JobRepository;
+import com.example.career.domain.onboarding.repository.MemberCertificateRepository;
 import com.example.career.domain.onboarding.repository.MemberSkillRepository;
 import com.example.career.global.error.errorcode.ErrorCode;
 import com.example.career.global.error.exception.BadRequestException;
@@ -27,6 +31,8 @@ public class OnboardingService {
     private final MemberRepository memberRepository;
     private final JobRepository jobRepository;
     private final MemberSkillRepository memberSkillRepository;
+    private final CertificateRepository certificateRepository;
+    private final MemberCertificateRepository memberCertificateRepository;
 
     @Transactional
     public JobSelectionResponseDto saveJobSelection(MemberDetails user, JobSelectionRequestDto jobSelectionRequestDto) {
@@ -73,5 +79,23 @@ public class OnboardingService {
                 .collect(Collectors.toList());
 
         memberSkillRepository.saveAll(skills);
+    }
+
+    @Transactional
+    public void saveSelectedCertificates(MemberDetails user, List<String> certificateNames) {
+        Long memberId = user.getMember().getId();
+
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new NotFoundException(ErrorCode.MEMBER_NOT_FOUND));
+
+        List<Certificate> certificates = certificateRepository.findAllByNameIn(certificateNames);
+
+        for (Certificate certificate : certificates) {
+            boolean alreadyExists = memberCertificateRepository.existsByMemberAndCertificate(member, certificate);
+
+            if (!alreadyExists) {
+                memberCertificateRepository.save(new MemberCertificate(member, certificate));
+            }
+        }
     }
 }
