@@ -9,6 +9,4 @@ import java.util.List;
 public interface MemberCertificateRepository extends JpaRepository<MemberCertificate, Long> {
 
     List<MemberCertificate> findByMember(Member member);
-
-    void deleteAllByMember(Long memberId);
 }
