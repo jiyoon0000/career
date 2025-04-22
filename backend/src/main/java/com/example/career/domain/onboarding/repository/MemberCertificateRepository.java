@@ -10,4 +10,6 @@ import java.util.List;
 public interface MemberCertificateRepository extends JpaRepository<MemberCertificate, Long> {
 
     boolean existsByMemberAndCertificate(Member member, Certificate certificate);
+
+    long countByMember(Member member);
 }

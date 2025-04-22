@@ -11,4 +11,6 @@ public interface MemberSkillRepository extends JpaRepository<MemberSkill, Long> 
     List<MemberSkill> findByMember(Member member);
 
     void deleteAllByMemberId(Long memberId);
+
+    long countByMemberId(Long id);
 }

@@ -13,4 +13,6 @@ public interface CertificateRepository extends JpaRepository<Certificate, Long> 
     List<Certificate> findAllByNameIn(List<String> certificateNames);
 
     List<Certificate> findAllByJob(Job job);
+
+    boolean existsByJob(Job job);
 }

@@ -4,6 +4,7 @@ import com.example.career.domain.member.entity.Member;
 import com.example.career.domain.member.repository.MemberRepository;
 import com.example.career.domain.onboarding.dto.JobSelectionRequestDto;
 import com.example.career.domain.onboarding.dto.JobSelectionResponseDto;
+import com.example.career.domain.onboarding.dto.OnboardingCompletionResponseDto;
 import com.example.career.domain.onboarding.dto.SkillSelectionRequestDto;
 import com.example.career.domain.onboarding.entity.Certificate;
 import com.example.career.domain.onboarding.entity.Job;
@@ -97,5 +98,33 @@ public class OnboardingService {
                 memberCertificateRepository.save(new MemberCertificate(member, certificate));
             }
         }
+    }
+
+    public OnboardingCompletionResponseDto isOnboardingCompleted(MemberDetails user) {
+        Long memberId = user.getMember().getId();
+
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new NotFoundException(ErrorCode.MEMBER_NOT_FOUND));
+
+        Job job = member.getJob();
+        if (job == null) {
+            return new OnboardingCompletionResponseDto(false);
+        }
+
+        long skillCount = memberSkillRepository.countByMemberId(member.getId());
+        if (skillCount == 0) {
+            return new OnboardingCompletionResponseDto(false);
+        }
+
+        boolean hasRecommendedCerts = certificateRepository.existsByJob(job);
+        if (hasRecommendedCerts) {
+            long selectedCerCount = memberCertificateRepository.countByMember(member);
+
+            if (selectedCerCount == 0) {
+                return new OnboardingCompletionResponseDto(false);
+            }
+        }
+
+        return new OnboardingCompletionResponseDto(true);
     }
 }
