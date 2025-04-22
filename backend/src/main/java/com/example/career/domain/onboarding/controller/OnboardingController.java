@@ -1,13 +1,17 @@
 package com.example.career.domain.onboarding.controller;
 
+import com.example.career.domain.onboarding.dto.CertificateResponseDto;
 import com.example.career.domain.onboarding.dto.JobSelectionRequestDto;
 import com.example.career.domain.onboarding.dto.JobSelectionResponseDto;
 import com.example.career.domain.onboarding.dto.SkillRecommendResponseDto;
 import com.example.career.domain.onboarding.dto.SkillSelectionRequestDto;
 import com.example.career.domain.onboarding.service.AiService;
+import com.example.career.domain.onboarding.service.CertificateFetchService;
 import com.example.career.domain.onboarding.service.OnboardingService;
 import com.example.career.global.common.CommonResponseDto;
 import com.example.career.global.common.SuccessCode;
+import com.example.career.global.error.errorcode.ErrorCode;
+import com.example.career.global.error.exception.BadRequestException;
 import com.example.career.global.security.MemberDetails;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -31,6 +35,7 @@ public class OnboardingController {
 
     private final OnboardingService onboardingService;
     private final AiService aiService;
+    private final CertificateFetchService certificateFetchService;
 
     @PostMapping("/jobs")
     @Operation(summary = "직무 선택 저장", description = "사용자가 선택한 직무를 저장")
@@ -64,5 +69,20 @@ public class OnboardingController {
         onboardingService.saveSkillSelection(user, skillSelectionRequestDto);
 
         return ResponseEntity.ok(CommonResponseDto.success(SuccessCode.CREATE_SUCCESS, null));
+    }
+
+    @GetMapping("/certificates/recommend")
+    @Operation(summary = "추천 자격증 조회", description = "선택한 직무 기반으로 고용24 API에서 관련 자격증 조회")
+    public ResponseEntity<CommonResponseDto<List<CertificateResponseDto>>> recommendCertificates(@AuthenticationPrincipal MemberDetails user) {
+
+        String jobCode = user.getMember().getJob() != null ? user.getMember().getJob().getCode() : null;
+
+        if (jobCode == null) {
+            throw new BadRequestException(ErrorCode.JOB_NOT_SELECTED);
+        }
+
+        List<CertificateResponseDto> certificates = certificateFetchService.fetchAndSaveCertificates(jobCode);
+
+        return ResponseEntity.ok(CommonResponseDto.success(SuccessCode.FETCH_SUCCESS, certificates));
     }
 }

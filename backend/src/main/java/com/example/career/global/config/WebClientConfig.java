@@ -13,10 +13,21 @@ public class WebClientConfig {
     @Value("${external.job-api.base-url}")
     private String jobDictionaryBaseUrl;
 
-    @Bean
+    @Value("${external.cert-api.base-url}")
+    private String certApiBaseUrl;
+
+    @Bean("jobWebClient")
     public WebClient jobWebClient() {
         return WebClient.builder()
                 .baseUrl(jobDictionaryBaseUrl)
+                .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_XML_VALUE)
+                .build();
+    }
+
+    @Bean("certWebClient")
+    public WebClient certWebClient() {
+        return WebClient.builder()
+                .baseUrl(certApiBaseUrl)
                 .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_XML_VALUE)
                 .build();
     }

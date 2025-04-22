@@ -11,9 +11,11 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Getter
+@NoArgsConstructor
 @Table(name = "member_certificates")
 public class MemberCertificate extends BaseEntity {
 
@@ -28,4 +30,9 @@ public class MemberCertificate extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "certificate_id")
     private Certificate certificate;
+
+    public MemberCertificate(Member member, Certificate certificate) {
+        this.member = member;
+        this.certificate = certificate;
+    }
 }
