@@ -106,15 +106,6 @@ public class StudyRoomService {
 
     private StudyRoom toStudyRoom(StudyRoomReservationRowDto rowDto) {
 
-        System.out.println("✔ 매핑 전 확인 - SVCID: " + rowDto.getSvcId());
-        System.out.println("✔ 매핑 전 확인 - SVCNM: " + rowDto.getSvcNm());
-        System.out.println("✔ 매핑 전 확인 - PLACENM: " + rowDto.getPlaceNm());
-        System.out.println("✔ 매핑 전 확인 - AREANM: " + rowDto.getAreaNm());
-        System.out.println("✔ 매핑 전 확인 - X: " + rowDto.getX());
-        System.out.println("✔ 매핑 전 확인 - Y: " + rowDto.getY());
-        System.out.println("✔ 매핑 전 확인 - TELNO: " + rowDto.getTelNo());
-        System.out.println("✔ 매핑 전 확인 - IMGURL: " + rowDto.getImgUrl());
-
         return StudyRoom.builder()
                 .source(Source.SERVICE)
                 .externalId(rowDto.getSvcId())
