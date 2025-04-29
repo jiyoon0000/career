@@ -19,6 +19,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -28,6 +29,9 @@ public class StudyRoomService {
 
     private final ObjectMapper objectMapper;
     private final StudyRoomRepository studyRoomRepository;
+
+    @Value("${external.seoul-api.base-url}")
+    private String baseUrl;
 
     @Value("${seoul.api.key}")
     private String apiKey;
@@ -41,10 +45,10 @@ public class StudyRoomService {
         try {
             JsonNode root = objectMapper.readTree(jsonResponse);
 
-            JsonNode cultureNode = root.get("ListPublicReservationCulture");
+            JsonNode cultureNode = root.get("ListPublicReservationInstitution");
 
             if (cultureNode == null) {
-                throw new RuntimeException("ListPublicReservationCulture 필드가 없습니다.");
+                throw new RuntimeException("ListPublicReservationInstitution 필드가 없습니다.");
             }
 
             StudyRoomReservationResponseDto reservationResponseDto = objectMapper.treeToValue(cultureNode, StudyRoomReservationResponseDto.class);
@@ -52,10 +56,11 @@ public class StudyRoomService {
             List<StudyRoomReservationRowDto> rows = reservationResponseDto.getRow();
 
             if (rows == null || rows.isEmpty()) {
-                throw new RuntimeException("스터디룸 데이터가 비어 있습니다.");
+                throw new RuntimeException("청년공간 데이터가 비어 있습니다.");
             }
 
             List<StudyRoom> studyRooms = rows.stream()
+                    .filter(rowDto -> "청년공간".equals(rowDto.getMinClassNm()))
                     .map(this::toStudyRoom)
                     .collect(Collectors.toList());
 
@@ -68,10 +73,10 @@ public class StudyRoomService {
 
     private String fetchStudyRoomFromSeoulApi() {
         try {
-            StringBuilder urlBuilder = new StringBuilder("http://openapi.seoul.go.kr:8088");
+            StringBuilder urlBuilder = new StringBuilder(baseUrl);
             urlBuilder.append("/" + URLEncoder.encode(apiKey, StandardCharsets.UTF_8));
             urlBuilder.append("/" + URLEncoder.encode("json", StandardCharsets.UTF_8));
-            urlBuilder.append("/" + URLEncoder.encode("ListPublicReservationCulture", StandardCharsets.UTF_8));
+            urlBuilder.append("/" + URLEncoder.encode("ListPublicReservationInstitution", StandardCharsets.UTF_8));
             urlBuilder.append("/" + URLEncoder.encode("1", StandardCharsets.UTF_8));
             urlBuilder.append("/" + URLEncoder.encode("1000", StandardCharsets.UTF_8));
 
@@ -100,6 +105,7 @@ public class StudyRoomService {
 
             return sb.toString();
         } catch (IOException e) {
+            e.printStackTrace();
             throw new RuntimeException("서울시 OpenAPI 호출 실패", e);
         }
     }
@@ -108,16 +114,32 @@ public class StudyRoomService {
 
         return StudyRoom.builder()
                 .source(Source.SERVICE)
+                .gubun(rowDto.getGubun())
                 .externalId(rowDto.getSvcId())
+                .maxClassNm(rowDto.getMaxClassNm())
+                .minClassNm(rowDto.getMinClassNm())
+                .svcStatNm(rowDto.getSvcStatNm())
                 .name(rowDto.getSvcNm())
+                .payAtNm(rowDto.getPayAtNm())
                 .address(rowDto.getPlaceNm())
-                .region(rowDto.getAreaNm())
+                .useTgtInfo(rowDto.getUseTgtInfo())
+                .svcUrl(rowDto.getSvcUrl())
                 .x(parseDoubleOrNull(rowDto.getX()))
                 .y(parseDoubleOrNull(rowDto.getY()))
-                .phone(rowDto.getTelNo())
-                .category(null)
+                .startDate(parseDateTime(rowDto.getSvcOpnBgndt()))
+                .endDate(parseDateTime(rowDto.getSvcOpnEnddt()))
+                .applyStartDate(parseDateTime(rowDto.getRcptBgndt()))
+                .applyEndDate(parseDateTime(rowDto.getRcptEnddt()))
+                .region(rowDto.getAreaNm())
                 .imageUrl(rowDto.getImgUrl())
-                .useTime(null)
+                .detailContent(rowDto.getDtlCont())
+                .phone(rowDto.getTelNo())
+                .vMin(rowDto.getVMin())
+                .vMax(rowDto.getVMax())
+                .revStdDayNm(rowDto.getRevStdDayNm())
+                .revStdDay(rowDto.getRevStdDay())
+                .useTime(rowDto.getVMin() + " ~ " + rowDto.getVMax())
+                .category(rowDto.getMinClassNm())
                 .build();
     }
 
@@ -128,4 +150,15 @@ public class StudyRoomService {
             return null;
         }
     }
+
+    private LocalDateTime parseDateTime(String value) {
+        try {
+            return value != null && !value.isBlank()
+                    ? LocalDateTime.parse(value.replace(" ", "T"))
+                    : null;
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
 }
