@@ -9,12 +9,15 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
 @Getter
+@Table(name = "study_room")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class StudyRoom extends BaseEntity {
 
@@ -48,4 +51,20 @@ public class StudyRoom extends BaseEntity {
     private String imageUrl;
 
     private String useTime;
+
+    @Builder
+    public StudyRoom(Source source, String externalId, String name, String address, String region,
+                     Double x, Double y, String phone, String category, String imageUrl, String useTime) {
+        this.source = source;
+        this.externalId = externalId;
+        this.name = name;
+        this.address = address;
+        this.region = region;
+        this.x = x;
+        this.y = y;
+        this.phone = phone;
+        this.category = category;
+        this.imageUrl = imageUrl;
+        this.useTime = useTime;
+    }
 }
