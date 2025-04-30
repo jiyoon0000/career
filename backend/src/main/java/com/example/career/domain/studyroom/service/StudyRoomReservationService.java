@@ -25,7 +25,7 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-public class StudyRoomService {
+public class StudyRoomReservationService {
 
     private final ObjectMapper objectMapper;
     private final StudyRoomRepository studyRoomRepository;
@@ -110,36 +110,36 @@ public class StudyRoomService {
         }
     }
 
-    private StudyRoom toStudyRoom(StudyRoomReservationRowDto rowDto) {
+    private StudyRoom toStudyRoom(StudyRoomReservationRowDto dto) {
 
         return StudyRoom.builder()
                 .source(Source.SERVICE)
-                .gubun(rowDto.getGubun())
-                .externalId(rowDto.getSvcId())
-                .maxClassNm(rowDto.getMaxClassNm())
-                .minClassNm(rowDto.getMinClassNm())
-                .svcStatNm(rowDto.getSvcStatNm())
-                .name(rowDto.getSvcNm())
-                .payAtNm(rowDto.getPayAtNm())
-                .address(rowDto.getPlaceNm())
-                .useTgtInfo(rowDto.getUseTgtInfo())
-                .svcUrl(rowDto.getSvcUrl())
-                .x(parseDoubleOrNull(rowDto.getX()))
-                .y(parseDoubleOrNull(rowDto.getY()))
-                .startDate(parseDateTime(rowDto.getSvcOpnBgndt()))
-                .endDate(parseDateTime(rowDto.getSvcOpnEnddt()))
-                .applyStartDate(parseDateTime(rowDto.getRcptBgndt()))
-                .applyEndDate(parseDateTime(rowDto.getRcptEnddt()))
-                .region(rowDto.getAreaNm())
-                .imageUrl(rowDto.getImgUrl())
-                .detailContent(rowDto.getDtlCont())
-                .phone(rowDto.getTelNo())
-                .vMin(rowDto.getVMin())
-                .vMax(rowDto.getVMax())
-                .revStdDayNm(rowDto.getRevStdDayNm())
-                .revStdDay(rowDto.getRevStdDay())
-                .useTime(rowDto.getVMin() + " ~ " + rowDto.getVMax())
-                .category(rowDto.getMinClassNm())
+                .externalId(dto.getSvcId())
+                .name(dto.getSvcNm())
+                .description(null)
+                .address(dto.getPlaceNm())
+                .detailAddress(null)
+                .region(dto.getAreaNm())
+                .x(parseDoubleOrNull(dto.getX()))
+                .y(parseDoubleOrNull(dto.getY()))
+                .phone(dto.getTelNo())
+                .imageUrl(dto.getImgUrl())
+                .category(dto.getMinClassNm())
+                .useTime(dto.getVMin() + " ~ " + dto.getVMax())
+                .holiday(null)
+                .status(dto.getSvcStatNm())
+                .payType(dto.getPayAtNm())
+                .cancelPolicy(dto.getRevStdDayNm() + " / " + dto.getRevStdDay())
+                .detail(dto.getDtlCont())
+                .serviceUrl(dto.getSvcUrl())
+                .organizationName(null)
+                .applyStart(parseDateTime(dto.getRcptBgndt()))
+                .applyEnd(parseDateTime(dto.getRcptEnddt()))
+                .serviceStart(parseDateTime(dto.getSvcOpnBgndt()))
+                .serviceEnd(parseDateTime(dto.getSvcOpnEnddt()))
+                .facilityInfo(null)
+                .reservationNote(null)
+                .approvalMethod(null)
                 .build();
     }
 
