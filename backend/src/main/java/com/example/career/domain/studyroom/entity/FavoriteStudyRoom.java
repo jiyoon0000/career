@@ -1,6 +1,7 @@
 package com.example.career.domain.studyroom.entity;
 
 import com.example.career.domain.member.entity.Member;
+import com.example.career.global.common.BaseEntity;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
@@ -15,7 +16,7 @@ import lombok.NoArgsConstructor;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class FavoriteStudyRoom {
+public class FavoriteStudyRoom extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
