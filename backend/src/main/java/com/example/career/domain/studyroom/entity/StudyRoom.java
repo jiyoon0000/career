@@ -31,111 +31,114 @@ public class StudyRoom extends BaseEntity {
     @Column(nullable = false)
     private Source source;
 
-    private String gubun;
-
-    @Column(length = 100, unique = true)
+    @Column(name = "external_id", length = 100, unique = true)
     private String externalId;
-
-    @Column(name = "max_class_nm")
-    private String maxClassNm;
-
-    @Column(name = "min_class_nm")
-    private String minClassNm;
-
-    @Column(name = "svc_stat_nm")
-    private String svcStatNm;
 
     @Column(nullable = false)
     private String name;
 
-    @Column(name = "pay_at_nm")
-    private String payAtNm;
+    @Column(columnDefinition = "TEXT")
+    private String description;
 
     @Column(columnDefinition = "TEXT")
     private String address;
 
-    @Column(name = "use_tgt_info", columnDefinition = "TEXT")
-    private String useTgtInfo;
+    @Column(name = "detail_address", columnDefinition = "TEXT")
+    private String detailAddress;
 
-    @Column(name = "svc_url", columnDefinition = "TEXT")
-    private String svcUrl;
+    @Column(length = 50)
+    private String region;
 
     private Double x;
-
     private Double y;
 
-    @Column(name = "start_date")
-    private LocalDateTime startDate;
-
-    @Column(name = "end_date")
-    private LocalDateTime endDate;
-
-    @Column(name = "apply_start_date")
-    private LocalDateTime applyStartDate;
-
-    @Column(name = "apply_end_date")
-    private LocalDateTime applyEndDate;
-
-    private String region;
+    private String phone;
 
     @Column(name = "image_url", columnDefinition = "TEXT")
     private String imageUrl;
 
-    @Column(name = "detail_content", columnDefinition = "TEXT")
-    private String detailContent;
-
-    private String phone;
-
-    @Column(name = "v_min")
-    private String vMin;
-
-    @Column(name = "v_max")
-    private String vMax;
-
-    @Column(name = "rev_std_day_nm")
-    private String revStdDayNm;
-
-    @Column(name = "rev_std_day")
-    private String revStdDay;
-
-    private String useTime;
-
     private String category;
 
+    @Column(name = "use_time", length = 100)
+    private String useTime;
+
+    @Column(columnDefinition = "TEXT")
+    private String holiday;
+
+    @Column(length = 50)
+    private String status;
+
+    @Column(name = "pay_type", length = 50)
+    private String payType;
+
+    @Column(name = "cancel_policy", columnDefinition = "TEXT")
+    private String cancelPolicy;
+
+    @Column(name = "detail", columnDefinition = "TEXT")
+    private String detail;
+
+    @Column(name = "service_url", columnDefinition = "TEXT")
+    private String serviceUrl;
+
+    @Column(name = "organization_name", length = 100)
+    private String organizationName;
+
+    @Column(name = "apply_start")
+    private LocalDateTime applyStart;
+
+    @Column(name = "apply_end")
+    private LocalDateTime applyEnd;
+
+    @Column(name = "service_start")
+    private LocalDateTime serviceStart;
+
+    @Column(name = "service_end")
+    private LocalDateTime serviceEnd;
+
+    @Column(name = "facility_info", columnDefinition = "TEXT")
+    private String facilityInfo;
+
+    @Column(name = "reservation_note", columnDefinition = "TEXT")
+    private String reservationNote;
+
+    @Column(name = "approval_method", length = 50)
+    private String approvalMethod;
+
     @Builder
-    public StudyRoom(Source source, String gubun, String externalId, String maxClassNm, String minClassNm,
-                     String svcStatNm, String name, String payAtNm, String address, String useTgtInfo,
-                     String svcUrl, Double x, Double y, LocalDateTime startDate, LocalDateTime endDate,
-                     LocalDateTime applyStartDate, LocalDateTime applyEndDate, String region, String imageUrl, String detailContent,
-                     String phone, String vMin, String vMax, String revStdDayNm, String revStdDay,
-                     String useTime, String category) {
+    public StudyRoom(Source source, String externalId, String name, String description,
+                     String address, String detailAddress, String region,
+                     Double x, Double y, String phone, String imageUrl, String category, String useTime, String holiday,
+                     String status, String payType, String cancelPolicy, String detail, String serviceUrl,
+                     String organizationName, LocalDateTime applyStart, LocalDateTime applyEnd,
+                     LocalDateTime serviceStart, LocalDateTime serviceEnd,
+                     String facilityInfo, String reservationNote, String approvalMethod) {
         this.source = source;
-        this.gubun = gubun;
         this.externalId = externalId;
-        this.maxClassNm = maxClassNm;
-        this.minClassNm = minClassNm;
-        this.svcStatNm = svcStatNm;
         this.name = name;
-        this.payAtNm = payAtNm;
+        this.description = description;
         this.address = address;
-        this.useTgtInfo = useTgtInfo;
-        this.svcUrl = svcUrl;
+        this.detailAddress = detailAddress;
+        this.region = region;
         this.x = x;
         this.y = y;
-        this.startDate = startDate;
-        this.endDate = endDate;
-        this.applyStartDate = applyStartDate;
-        this.applyEndDate = applyEndDate;
-        this.region = region;
-        this.imageUrl = imageUrl;
-        this.detailContent = detailContent;
         this.phone = phone;
-        this.vMin = vMin;
-        this.vMax = vMax;
-        this.revStdDayNm = revStdDayNm;
-        this.revStdDay = revStdDay;
-        this.useTime = useTime;
+        this.imageUrl = imageUrl;
         this.category = category;
+        this.useTime = useTime;
+        this.holiday = holiday;
+        this.status = status;
+        this.payType = payType;
+        this.cancelPolicy = cancelPolicy;
+        this.detail = detail;
+        this.serviceUrl = serviceUrl;
+        this.organizationName = organizationName;
+        this.applyStart = applyStart;
+        this.applyEnd = applyEnd;
+        this.serviceStart = serviceStart;
+        this.serviceEnd = serviceEnd;
+        this.facilityInfo = facilityInfo;
+        this.reservationNote = reservationNote;
+        this.approvalMethod = approvalMethod;
     }
-    
+
 }
