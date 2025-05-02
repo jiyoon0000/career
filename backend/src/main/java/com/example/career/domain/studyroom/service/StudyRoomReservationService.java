@@ -33,7 +33,7 @@ public class StudyRoomReservationService {
     @Value("${external.seoul-api.base-url}")
     private String baseUrl;
 
-    @Value("${seoul.api.key}")
+    @Value("${SEOUL_API_KEY}")
     private String apiKey;
 
     @Transactional
