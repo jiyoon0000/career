@@ -15,6 +15,8 @@ export default function RootLayout() {
   const colorScheme = useColorScheme();
   const [loaded] = useFonts({
     SpaceMono: require('../src/assets/fonts/SpaceMono-Regular.ttf'),
+    PretendardRegular: require('@/assets/fonts/Pretendard-Regular.ttf'),
+    PretendardSemiBold: require('@/assets/fonts/Pretendard-SemiBold.ttf'),
   });
 
   useEffect(() => {
