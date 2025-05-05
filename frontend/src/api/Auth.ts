@@ -11,7 +11,7 @@ export async function login({ email, password }: LoginRequest) {
       email,
       password,
     });
-    return response.data; // 보통 accessToken 반환
+    return response.data;
   } catch (error: any) {
     console.error('로그인 실패:', error.response?.data || error.message);
     throw error;

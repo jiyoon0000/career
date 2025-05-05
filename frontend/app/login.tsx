@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { router } from 'expo-router';
 import {
   SafeAreaView,
   View,
@@ -8,12 +9,32 @@ import {
   Image,
   ScrollView,
   StyleSheet,
+  Alert,
 } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { login } from '@/api/Auth';
 
 export default function LoginScreen() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+  const [autoLoginChecked, setAutoLoginChecked] = useState(false);
+
+  const handleLogin = async () => {
+    try {
+      const res = await login({ email, password });
+      await AsyncStorage.setItem('accessToken', res.accessToken);
+
+      if (autoLoginChecked) {
+        await AsyncStorage.setItem('autoLogin', 'true');
+      }
+
+      Alert.alert('로그인 성공');
+
+    } catch (error) {
+      Alert.alert('로그인 실패', '이메일 또는 비밀번호가 올바르지 않습니다.');
+    }
+  };
 
   return (
     <SafeAreaView style={styles.safeArea}>
@@ -24,7 +45,7 @@ export default function LoginScreen() {
 
         <View style={styles.logoWrapper}>
           <Image
-            source={require('@/assets/images/logo.png')}    
+            source={require('@/assets/images/logo.png')}
             style={styles.logo}
           />
         </View>
@@ -61,7 +82,11 @@ export default function LoginScreen() {
             />
             <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
               <Image
-                source={require('@/assets/images/right-icon-wrapper-2.png')}
+                source={
+                  showPassword
+                    ? require('@/assets/images/input-field-icon.png')
+                    : require('@/assets/images/right-icon-wrapper-2.png')
+                }
                 style={styles.iconButton}
               />
             </TouchableOpacity>
@@ -69,11 +94,20 @@ export default function LoginScreen() {
 
           <View style={styles.optionRow}>
             <View style={styles.autoLoginRow}>
-              <Image
-                source={{ uri: 'https://storage.googleapis.com/tagjs-prod.appspot.com/v1/SwBe9fxTmm/dbc9g7w6_expires_30_days.png' }}
-                style={styles.autoLoginIcon}
-              />
-              <Text style={styles.optionText}>자동 로그인</Text>
+              <TouchableOpacity
+                style={styles.autoLoginRow}
+                onPress={() => setAutoLoginChecked(prev => !prev)}
+              >
+                <Image
+                  source={
+                    autoLoginChecked
+                      ? require('@/assets/images/checkbox.png')
+                      : require('@/assets/images/checkbox-unselected.png')
+                  }
+                  style={styles.autoLoginIcon}
+                />
+                <Text style={styles.optionText}>자동 로그인</Text>
+              </TouchableOpacity>
             </View>
             <TouchableOpacity style={styles.findPasswordRow}>
               <Text style={styles.optionText}>비밀번호 찾기</Text>
@@ -84,7 +118,7 @@ export default function LoginScreen() {
             </TouchableOpacity>
           </View>
 
-          <TouchableOpacity style={styles.loginButton}>
+          <TouchableOpacity style={styles.loginButton} onPress={handleLogin}>
             <Text style={styles.loginButtonText}>이메일 로그인</Text>
           </TouchableOpacity>
 
@@ -97,10 +131,12 @@ export default function LoginScreen() {
           </TouchableOpacity>
 
           <View style={styles.signUpWrapper}>
-            <Text style={styles.optionText}>
-              아직 회원이 아니신가요?{' '}
-              <Text style={styles.signUpText}>회원가입</Text>
-            </Text>
+            <TouchableOpacity onPress={() => router.push('/(auth)/join/Email')}>
+              <Text style={styles.optionText}>
+                아직 회원이 아니신가요?{' '}
+                <Text style={styles.signUpText}>회원가입</Text>
+              </Text>
+            </TouchableOpacity>
           </View>
         </View>
       </ScrollView>
