@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   SafeAreaView,
   View,
@@ -9,13 +9,23 @@ import {
   StyleSheet,
 } from 'react-native';
 import { router } from 'expo-router';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
-export default function EmailInputScreen() {
+export default function VerificationCodeScreen() {
+  const [code, setCode] = useState('');
   const [email, setEmail] = useState('');
 
-  const handleSendCode = () => {
-    // 이후 서버 통신 추가 가능
-    router.push('/(auth)/join/Verify-code');
+  useEffect(() => {
+    const fetchEmail = async () => {
+      const storedEmail = await AsyncStorage.getItem('signup_email');
+      if (storedEmail) setEmail(storedEmail);
+    };
+    fetchEmail();
+  }, []);
+
+  const handleVerify = () => {
+    // TODO: 인증코드 검증 로직 추가 예정
+    router.push('/(auth)/join/Password');
   };
 
   return (
@@ -35,30 +45,36 @@ export default function EmailInputScreen() {
       </View>
 
       <View style={styles.content}>
-        <Text style={styles.heading}>로그인에 사용할{'\n'}이메일을 알려주세요</Text>
-        <Text style={styles.sub}>아무에게도 공개되지 않으니 걱정마세요!</Text>
+        <Text style={styles.heading}>
+          이메일로 발송된{'\n'}인증코드를 입력해 주세요
+        </Text>
+        <Text style={styles.sub}>{email} 으로 보냈어요!</Text>
 
         <View style={styles.inputWrapper}>
           <TextInput
-            placeholder="이메일을 입력해 주세요"
-            value={email}
-            onChangeText={setEmail}
-            keyboardType="email-address"
-            autoCapitalize="none"
+            placeholder="인증코드를 입력해 주세요"
+            value={code}
+            onChangeText={setCode}
+            keyboardType="number-pad"
             style={styles.input}
           />
+        </View>
+
+        <View style={styles.resendRow}>
+          <Text style={styles.resendText}>인증코드 메일이 오지 않았나요?</Text>
+          <Text style={styles.resendButton}>재전송</Text>
         </View>
 
         <TouchableOpacity
           style={[
             styles.button,
-            { backgroundColor: email ? '#2379FA' : '#F7F7FB' },
+            { backgroundColor: code ? '#2379FA' : '#F7F7FB' },
           ]}
-          onPress={handleSendCode}
-          disabled={!email}
+          onPress={handleVerify}
+          disabled={!code}
         >
-          <Text style={[styles.buttonText, { color: email ? '#fff' : '#999' }]}>
-            인증코드 발송
+          <Text style={[styles.buttonText, { color: code ? '#fff' : '#999' }]}>
+            인증코드 확인
           </Text>
         </TouchableOpacity>
       </View>
@@ -84,7 +100,7 @@ const styles = StyleSheet.create({
     marginTop: 8,
   },
   progress: {
-    width: '33%',
+    width: '66%',
     height: 6,
     backgroundColor: '#2379FA',
     borderRadius: 100,
@@ -113,6 +129,13 @@ const styles = StyleSheet.create({
     color: '#111',
     paddingVertical: 10,
   },
+  resendRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 12,
+  },
+  resendText: { color: '#767676', fontSize: 14, flex: 1 },
+  resendButton: { color: '#2379FA', fontSize: 14 },
   button: {
     borderRadius: 12,
     paddingVertical: 14,
