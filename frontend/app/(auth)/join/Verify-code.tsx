@@ -10,7 +10,7 @@ import {
   Alert,
 } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
-import { sendVerificationCode } from '@/api/Auth';
+import { sendVerificationCode, verifyEmailCode } from '@/api/Auth';
 
 export default function VerificationCodeScreen() {
   const { email } = useLocalSearchParams<{ email: string }>();
@@ -42,15 +42,25 @@ export default function VerificationCodeScreen() {
     return `${m}:${s}`;
   };
 
-  const handleVerify = () => {
-    if (code.length === 0) {
+  const handleVerify = async () => {
+    if (!code) {
       Alert.alert('인증코드를 입력해 주세요.');
       return;
     }
-    router.push({
-      pathname: '/(auth)/join/password',
-      params: { email },
-    });
+
+    try {
+      await verifyEmailCode({ email, code });
+
+      router.push({
+        pathname: '/(auth)/join/password',
+        params: { email },
+      });
+    } catch (error: any) {
+      Alert.alert(
+        '인증 실패',
+        error.response?.data?.message || '인증코드가 올바르지 않습니다.'
+      );
+    }
   };
 
   const handleResend = async () => {

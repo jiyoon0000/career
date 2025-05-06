@@ -16,7 +16,15 @@ import { signup } from '@/api/Auth';
 export default function PasswordSetupScreen() {
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
   const { email } = useLocalSearchParams<{ email: string }>();
+
+  const isValidPassword = (pw: string) =>
+    pw.length >= 8 &&
+    pw.length <= 12 &&
+    /[a-zA-Z]/.test(pw) &&
+    /\d/.test(pw) &&
+    /[^a-zA-Z0-9]/.test(pw);
 
   useEffect(() => {
     const backAction = () => true;
@@ -30,15 +38,23 @@ export default function PasswordSetupScreen() {
       return;
     }
 
+    if (!isValidPassword(password)) {
+      Alert.alert('오류', '비밀번호는 영어, 숫자, 특수문자를 포함한 8~12자여야 합니다.');
+      return;
+    }
+
     try {
+      setLoading(true);
       await signup({ email, password });
       Alert.alert('회원가입 완료', '이제 로그인할 수 있어요!');
-      router.replace('/');
+      router.replace('/login');
     } catch (error: any) {
       Alert.alert(
         '회원가입 실패',
         error.response?.data?.message || '문제가 발생했습니다. 다시 시도해 주세요.'
       );
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -79,18 +95,18 @@ export default function PasswordSetupScreen() {
         <TouchableOpacity
           style={[
             styles.button,
-            { backgroundColor: password ? '#2379FA' : '#F7F7FB' },
+            { backgroundColor: isValidPassword(password) ? '#2379FA' : '#F7F7FB' },
           ]}
           onPress={handleComplete}
-          disabled={!password}
+          disabled={!isValidPassword(password) || loading}
         >
           <Text
             style={[
               styles.buttonText,
-              { color: password ? '#fff' : '#999999' },
+              { color: isValidPassword(password) ? '#fff' : '#999999' },
             ]}
           >
-            완료
+            {loading ? '처리 중...' : '완료'}
           </Text>
         </TouchableOpacity>
       </View>
