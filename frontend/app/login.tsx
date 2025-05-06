@@ -131,7 +131,7 @@ export default function LoginScreen() {
           </TouchableOpacity>
 
           <View style={styles.signUpWrapper}>
-            <TouchableOpacity onPress={() => router.push('/(auth)/join/Email')}>
+            <TouchableOpacity onPress={() => router.push('/(auth)/join/email')}>
               <Text style={styles.optionText}>
                 아직 회원이 아니신가요?{' '}
                 <Text style={styles.signUpText}>회원가입</Text>

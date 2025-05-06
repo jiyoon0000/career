@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import {
   SafeAreaView,
   View,
@@ -7,25 +7,61 @@ import {
   TouchableOpacity,
   Image,
   StyleSheet,
+  Alert,
 } from 'react-native';
-import { router } from 'expo-router';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import { router, useLocalSearchParams } from 'expo-router';
+import { sendVerificationCode } from '@/api/Auth';
 
 export default function VerificationCodeScreen() {
+  const { email } = useLocalSearchParams<{ email: string }>();
   const [code, setCode] = useState('');
-  const [email, setEmail] = useState('');
+  const [timer, setTimer] = useState(300);
+  const intervalRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
-    const fetchEmail = async () => {
-      const storedEmail = await AsyncStorage.getItem('signup_email');
-      if (storedEmail) setEmail(storedEmail);
+    intervalRef.current = setInterval(() => {
+      setTimer(prev => {
+        if (prev <= 1) {
+          clearInterval(intervalRef.current!);
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+
+    return () => {
+      clearInterval(intervalRef.current!);
     };
-    fetchEmail();
   }, []);
 
+  const formatTime = (seconds: number) => {
+    const m = Math.floor(seconds / 60)
+      .toString()
+      .padStart(2, '0');
+    const s = (seconds % 60).toString().padStart(2, '0');
+    return `${m}:${s}`;
+  };
+
   const handleVerify = () => {
-    // TODO: 인증코드 검증 로직 추가 예정
-    router.push('/(auth)/join/Password');
+    if (code.length === 0) {
+      Alert.alert('인증코드를 입력해 주세요.');
+      return;
+    }
+    router.push({
+      pathname: '/(auth)/join/password',
+      params: { email },
+    });
+  };
+
+  const handleResend = async () => {
+    try {
+      if (!email) return;
+      await sendVerificationCode({ email });
+      setTimer(300);
+      Alert.alert('인증코드를 재전송했습니다.');
+    } catch (error) {
+      Alert.alert('오류', '인증코드 재전송에 실패했습니다.');
+    }
   };
 
   return (
@@ -48,7 +84,9 @@ export default function VerificationCodeScreen() {
         <Text style={styles.heading}>
           이메일로 발송된{'\n'}인증코드를 입력해 주세요
         </Text>
-        <Text style={styles.sub}>{email} 으로 보냈어요!</Text>
+        <Text style={styles.sub}>
+          {email ? `${email} 으로 보냈어요! 유효시간 ${formatTime(timer)}` : '이메일을 불러올 수 없습니다.'}
+        </Text>
 
         <View style={styles.inputWrapper}>
           <TextInput
@@ -62,7 +100,9 @@ export default function VerificationCodeScreen() {
 
         <View style={styles.resendRow}>
           <Text style={styles.resendText}>인증코드 메일이 오지 않았나요?</Text>
-          <Text style={styles.resendButton}>재전송</Text>
+          <TouchableOpacity onPress={handleResend}>
+            <Text style={styles.resendButton}>재전송</Text>
+          </TouchableOpacity>
         </View>
 
         <TouchableOpacity
@@ -115,7 +155,11 @@ const styles = StyleSheet.create({
     color: '#111',
     marginBottom: 8,
   },
-  sub: { fontSize: 14, color: '#767676', marginBottom: 32 },
+  sub: {
+    fontSize: 14,
+    color: '#767676',
+    marginBottom: 32,
+  },
   inputWrapper: {
     borderWidth: 1,
     borderColor: '#E5E5EC',
