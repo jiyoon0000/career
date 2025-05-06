@@ -42,6 +42,14 @@ export default function VerificationCodeScreen() {
     return `${m}:${s}`;
   };
 
+  const formatTime = (seconds: number) => {
+    const m = Math.floor(seconds / 60)
+      .toString()
+      .padStart(2, '0');
+    const s = (seconds % 60).toString().padStart(2, '0');
+    return `${m}:${s}`;
+  };
+
   const handleVerify = async () => {
     if (!code) {
       Alert.alert('인증코드를 입력해 주세요.');
