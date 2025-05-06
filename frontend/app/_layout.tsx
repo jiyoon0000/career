@@ -34,6 +34,11 @@ export default function RootLayout() {
       <Stack>
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
         <Stack.Screen name="+not-found" />
+
+        <Stack.Screen name="(auth)/join/email" options={{ headerShown: false }} />
+        <Stack.Screen name="(auth)/join/verify-code" options={{ headerShown: false }} />
+        <Stack.Screen name="(auth)/join/password" options={{ headerShown: false }} />
+
         <Stack.Screen name="onboarding/SplashScreen" options={{ headerShown: false }} />
         <Stack.Screen name="onboarding/StartScreen" options={{ headerShown: false }} />
       </Stack>
