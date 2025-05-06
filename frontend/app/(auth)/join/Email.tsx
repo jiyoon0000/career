@@ -38,7 +38,6 @@ export default function EmailInputScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
-      {/* 헤더 */}
       <View style={styles.header}>
         <TouchableOpacity onPress={() => router.back()}>
           <Image
@@ -49,12 +48,10 @@ export default function EmailInputScreen() {
         <Text style={styles.title}>회원가입</Text>
       </View>
 
-      {/* 진행도 */}
       <View style={styles.progressBar}>
         <View style={styles.progress} />
       </View>
 
-      {/* 본문 */}
       <View style={styles.content}>
         <Text style={styles.heading}>로그인에 사용할{'\n'}이메일을 알려주세요</Text>
         <Text style={styles.sub}>아무에게도 공개되지 않으니 걱정마세요!</Text>
