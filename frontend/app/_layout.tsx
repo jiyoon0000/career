@@ -15,6 +15,8 @@ export default function RootLayout() {
   const colorScheme = useColorScheme();
   const [loaded] = useFonts({
     SpaceMono: require('../src/assets/fonts/SpaceMono-Regular.ttf'),
+    PretendardRegular: require('@/assets/fonts/Pretendard-Regular.ttf'),
+    PretendardSemiBold: require('@/assets/fonts/Pretendard-SemiBold.ttf'),
   });
 
   useEffect(() => {
@@ -32,6 +34,8 @@ export default function RootLayout() {
       <Stack>
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
         <Stack.Screen name="+not-found" />
+        <Stack.Screen name="onboarding/SplashScreen" options={{ headerShown: false }} />
+        <Stack.Screen name="onboarding/StartScreen" options={{ headerShown: false }} />
       </Stack>
       <StatusBar style="auto" />
     </ThemeProvider>
