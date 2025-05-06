@@ -14,7 +14,10 @@ public enum SuccessCode {
     CREATE_SUCCESS("생성이 완료되었습니다."),
     FETCH_SUCCESS("성공적으로 조회되었습니다."),
     UPDATE_SUCCESS("성공적으로 수정되었습니다."),
-    DELETE_SUCCESS("성공적으로 삭제되었습니다.");
+    DELETE_SUCCESS("성공적으로 삭제되었습니다."),
+
+    EMAIL_SEND_SUCCESS("인증코드를 성공적으로 전송했습니다."),
+    EMAIL_VERIFY_SUCCESS("이메일 인증이 완료되었습니다.");
 
     private final String message;
 }

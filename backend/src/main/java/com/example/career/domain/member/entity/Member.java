@@ -50,13 +50,9 @@ public class Member extends SoftDeletableEntity {
     @JoinColumn(name = "job_id")
     private Job job;
 
-    public Member(String email, String password, String name, String birth, String phone, Gender gender) {
+    public Member(String email, String password) {
         this.email = email;
         this.password = password;
-        this.name = name;
-        this.birth = birth;
-        this.phone = phone;
-        this.gender = gender;
     }
 
     public void updatePassword(String newEncodedPassword) {

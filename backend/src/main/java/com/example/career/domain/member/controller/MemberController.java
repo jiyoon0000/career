@@ -5,7 +5,11 @@ import com.example.career.domain.member.dto.LoginRequestDto;
 import com.example.career.domain.member.dto.LoginResponseDto;
 import com.example.career.domain.member.dto.SignupRequestDto;
 import com.example.career.domain.member.service.MemberService;
+import com.example.career.global.auth.service.EmailAuthService;
 import com.example.career.global.common.CommonResponseDto;
+import com.example.career.global.common.SuccessCode;
+import com.example.career.global.error.errorcode.ErrorCode;
+import com.example.career.global.error.exception.CustomException;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
@@ -26,10 +30,20 @@ import org.springframework.web.bind.annotation.RestController;
 public class MemberController {
 
     private final MemberService memberService;
+    private final EmailAuthService emailAuthService;
 
     @PostMapping("/signup")
     public ResponseEntity<CommonResponseDto<String>> signup(@Valid @RequestBody SignupRequestDto signupRequestDto) {
-        return ResponseEntity.ok(memberService.signup(signupRequestDto));
+
+        if (!emailAuthService.isVerified(signupRequestDto.getEmail())) {
+            throw new CustomException(ErrorCode.EMAIL_NOT_VERIFIED);
+        }
+
+        memberService.signup(signupRequestDto);
+
+        emailAuthService.clearVerifiedFlag(signupRequestDto.getEmail());
+
+        return ResponseEntity.ok(CommonResponseDto.success(SuccessCode.SIGNUP_SUCCESS, null));
     }
 
     @PostMapping("/login")
