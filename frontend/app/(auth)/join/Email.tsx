@@ -19,11 +19,8 @@ export default function EmailInputScreen() {
   const handleSendCode = async () => {
     try {
       setLoading(true);
-      console.log('📨 이메일 전송 시작', email);
-  
-      const res = await sendVerificationCode({ email });
-      console.log('📩 응답 성공', res);
-  
+
+      const res = await sendVerificationCode({ email });  
       Alert.alert('성공', res.message || '인증코드를 전송했어요!');
   
       console.log('➡️ 라우팅 이동 시작');
@@ -32,18 +29,15 @@ export default function EmailInputScreen() {
         params: { email },
       });
     } catch (error: any) {
-      console.error('❌ 에러 발생', error);
       Alert.alert('오류', error.response?.data?.message || '인증코드 전송 실패');
     } finally {
       setLoading(false);
-      console.log('🔄 로딩 종료');
     }
   };
   
 
   return (
     <SafeAreaView style={styles.container}>
-      {/* 헤더 */}
       <View style={styles.header}>
         <TouchableOpacity onPress={() => router.back()}>
           <Image
@@ -54,12 +48,10 @@ export default function EmailInputScreen() {
         <Text style={styles.title}>회원가입</Text>
       </View>
 
-      {/* 진행도 */}
       <View style={styles.progressBar}>
         <View style={styles.progress} />
       </View>
 
-      {/* 본문 */}
       <View style={styles.content}>
         <Text style={styles.heading}>로그인에 사용할{'\n'}이메일을 알려주세요</Text>
         <Text style={styles.sub}>아무에게도 공개되지 않으니 걱정마세요!</Text>
