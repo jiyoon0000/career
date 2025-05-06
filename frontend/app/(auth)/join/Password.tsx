@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   SafeAreaView,
   View,
@@ -7,36 +7,51 @@ import {
   TouchableOpacity,
   Image,
   StyleSheet,
+  Alert,
+  BackHandler,
 } from 'react-native';
-import { router } from 'expo-router';
+import { router, useLocalSearchParams } from 'expo-router';
+import { signup } from '@/api/Auth';
 
 export default function PasswordSetupScreen() {
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+  const { email } = useLocalSearchParams<{ email: string }>();
 
-  const handleComplete = () => {
-    // TODO: 비밀번호 저장 및 회원가입 완료 처리
-    router.replace('/');
+  useEffect(() => {
+    const backAction = () => true;
+    const backHandler = BackHandler.addEventListener('hardwareBackPress', backAction);
+    return () => backHandler.remove();
+  }, []);
+
+  const handleComplete = async () => {
+    if (!email || !password) {
+      Alert.alert('오류', '이메일 또는 비밀번호가 누락되었습니다.');
+      return;
+    }
+
+    try {
+      await signup({ email, password });
+      Alert.alert('회원가입 완료', '이제 로그인할 수 있어요!');
+      router.replace('/');
+    } catch (error: any) {
+      Alert.alert(
+        '회원가입 실패',
+        error.response?.data?.message || '문제가 발생했습니다. 다시 시도해 주세요.'
+      );
+    }
   };
 
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
-        <TouchableOpacity onPress={() => router.back()}>
-          <Image
-            source={require('@/assets/images/item-actionbutton-navigation-bar-left.png')}
-            style={styles.backIcon}
-          />
-        </TouchableOpacity>
         <Text style={styles.title}>회원가입</Text>
       </View>
 
       <View style={styles.progressBar} />
 
       <View style={styles.content}>
-        <Text style={styles.heading}>
-          로그인에 사용할{'\n'}비밀번호를 입력해 주세요
-        </Text>
+        <Text style={styles.heading}>로그인에 사용할{'\n'}비밀번호를 입력해 주세요</Text>
         <Text style={styles.sub}>
           영어, 숫자, 특수문자를 포함한 8~12자를 입력해 주세요!
         </Text>
@@ -90,6 +105,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingTop: 44,
     paddingHorizontal: 20,
+    justifyContent: 'center',
   },
   backIcon: { width: 36, height: 44 },
   title: { fontSize: 20, fontWeight: 'bold', color: '#111' },
