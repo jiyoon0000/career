@@ -14,6 +14,7 @@ public enum ErrorCode {
     INVALID_TOKEN(HttpStatus.BAD_REQUEST, "유효하지 않은 토큰입니다."),
     JOB_NOT_SELECTED(HttpStatus.BAD_REQUEST, "선택된 직무가 없습니다."),
     INVALID_SKILL_COUNT(HttpStatus.BAD_REQUEST, "스킬은 최소 1개 이상, 최대 10개까지 선택할 수 있습니다."),
+    EMAIL_NOT_VERIFIED(HttpStatus.BAD_REQUEST, "이메일 인증이 완료되지 않았습니다."),
 
     // NOT_FOUND
     MEMBER_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 회원을 찾을 수 없습니다."),
