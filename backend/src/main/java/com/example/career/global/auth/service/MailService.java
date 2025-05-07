@@ -13,6 +13,8 @@ public class MailService {
 
     public void sendEMail(String to, String title, String content) {
 
+        System.out.println("try send mail : " + to);
+
         try {
             SimpleMailMessage simpleMailMessage = new SimpleMailMessage();
 
