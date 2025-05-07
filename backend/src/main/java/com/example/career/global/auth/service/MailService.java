@@ -13,12 +13,17 @@ public class MailService {
 
     public void sendEMail(String to, String title, String content) {
 
-        SimpleMailMessage simpleMailMessage = new SimpleMailMessage();
+        try {
+            SimpleMailMessage simpleMailMessage = new SimpleMailMessage();
 
-        simpleMailMessage.setTo(to);
-        simpleMailMessage.setSubject(title);
-        simpleMailMessage.setText(content);
+            simpleMailMessage.setTo(to);
+            simpleMailMessage.setSubject(title);
+            simpleMailMessage.setText(content);
 
-        mailSender.send(simpleMailMessage);
+            mailSender.send(simpleMailMessage);
+        } catch (Exception e) {
+            System.err.println("[이메일 전송 오류] " + e.getMessage());
+            e.printStackTrace();
+        }
     }
 }
