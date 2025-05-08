@@ -24,9 +24,15 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponse> handleException(Exception e, HttpServletRequest httpServletRequest) {
+        String uri = httpServletRequest.getRequestURI();
+
+        if (uri != null && uri.startsWith("/actuator")) {
+            throw new RuntimeException(e);
+        }
+
         return ErrorResponse.toResponseEntity(
                 ErrorCode.INTERNAL_SERVER_ERROR,
-                httpServletRequest.getRequestURI(),
+                uri,
                 httpServletRequest.getMethod()
         );
     }
