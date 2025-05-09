@@ -54,7 +54,7 @@ export async function signup({ email, password }: { email: string; password: str
 export async function login({ email, password }: LoginRequest) {
   try {
     const response = await axios.post(`${API}/api/auth/login`, { email, password });
-    return response.data;
+    return response.data.data;
   } catch (error: any) {
     console.error('로그인 실패:', error.response?.data || error.message);
     throw error;

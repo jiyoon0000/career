@@ -29,8 +29,13 @@ export default function LoginScreen() {
         await AsyncStorage.setItem('autoLogin', 'true');
       }
 
-      Alert.alert('로그인 성공');
-
+      const isFirstLogin = await AsyncStorage.getItem('hasOnboarded');
+      if (!isFirstLogin) {
+        await AsyncStorage.setItem('hasOnboarded', 'true');
+        router.replace('/onboarding/StartScreen');
+      } else {
+        router.replace('/(tabs)');
+      }
     } catch (error) {
       Alert.alert('로그인 실패', '이메일 또는 비밀번호가 올바르지 않습니다.');
     }
@@ -44,10 +49,7 @@ export default function LoginScreen() {
         </View>
 
         <View style={styles.logoWrapper}>
-          <Image
-            source={require('@/assets/images/logo.png')}
-            style={styles.logo}
-          />
+          <Image source={require('@/assets/images/logo.png')} style={styles.logo} />
         </View>
 
         <View style={styles.form}>
@@ -80,39 +82,61 @@ export default function LoginScreen() {
               style={styles.textInput}
               secureTextEntry={!showPassword}
             />
-            <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
-              <Image
-                source={
-                  showPassword
-                    ? require('@/assets/images/input-field-icon.png')
-                    : require('@/assets/images/right-icon-wrapper-2.png')
-                }
-                style={styles.iconButton}
-              />
-            </TouchableOpacity>
-          </View>
 
-          <View style={styles.optionRow}>
-            <View style={styles.autoLoginRow}>
-              <TouchableOpacity
-                style={styles.autoLoginRow}
-                onPress={() => setAutoLoginChecked(prev => !prev)}
-              >
+            {password.length > 0 ? (
+              <>
+                <TouchableOpacity onPress={() => setShowPassword(!showPassword)} style={{ marginRight: 1 }}>
+                  <Image
+                    source={
+                      showPassword
+                        ? require('@/assets/images/input-field-icon.png')
+                        : require('@/assets/images/right-icon-wrapper-2.png')
+                    }
+                    style={styles.iconButton}
+                  />
+                </TouchableOpacity>
+                <TouchableOpacity onPress={() => setPassword('')}>
+                  <Image
+                    source={require('@/assets/images/right-icon-wrapper.png')}
+                    style={styles.iconButton}
+                  />
+                </TouchableOpacity>
+              </>
+            ) : (
+              <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
                 <Image
                   source={
-                    autoLoginChecked
-                      ? require('@/assets/images/checkbox.png')
-                      : require('@/assets/images/checkbox-unselected.png')
+                    showPassword
+                      ? require('@/assets/images/input-field-icon.png')
+                      : require('@/assets/images/right-icon-wrapper-2.png')
                   }
-                  style={styles.autoLoginIcon}
+                  style={styles.iconButton}
                 />
-                <Text style={styles.optionText}>자동 로그인</Text>
               </TouchableOpacity>
-            </View>
+            )}
+          </View>
+
+
+          <View style={styles.optionRow}>
+            <TouchableOpacity
+              style={styles.autoLoginRow}
+              onPress={() => setAutoLoginChecked(prev => !prev)}
+            >
+              <Image
+                source={
+                  autoLoginChecked
+                    ? require('@/assets/images/checkbox.png')
+                    : require('@/assets/images/checkbox-unselected.png')
+                }
+                style={styles.autoLoginIcon}
+              />
+              <Text style={styles.optionText}>자동 로그인</Text>
+            </TouchableOpacity>
+
             <TouchableOpacity style={styles.findPasswordRow}>
               <Text style={styles.optionText}>비밀번호 찾기</Text>
               <Image
-                source={{ uri: 'https://storage.googleapis.com/tagjs-prod.appspot.com/v1/SwBe9fxTmm/1530svnv_expires_30_days.png' }}
+                source={require('@/assets/images/text-button-icon.png')}
                 style={styles.findIcon}
               />
             </TouchableOpacity>
@@ -122,9 +146,15 @@ export default function LoginScreen() {
             <Text style={styles.loginButtonText}>이메일 로그인</Text>
           </TouchableOpacity>
 
+          <View style={styles.divider}>
+            <View style={styles.line} />
+            <Text style={styles.orText}>또는</Text>
+            <View style={styles.line} />
+          </View>
+
           <TouchableOpacity style={styles.kakaoButton}>
             <Image
-              source={{ uri: 'https://storage.googleapis.com/tagjs-prod.appspot.com/v1/SwBe9fxTmm/kakao-login-icon.png' }}
+              source={require('@/assets/images/icon-kakao-36.png')}
               style={styles.kakaoIcon}
             />
             <Text style={styles.kakaoText}>카카오로 시작하기</Text>
@@ -133,8 +163,7 @@ export default function LoginScreen() {
           <View style={styles.signUpWrapper}>
             <TouchableOpacity onPress={() => router.push('/(auth)/join/email')}>
               <Text style={styles.optionText}>
-                아직 회원이 아니신가요?{' '}
-                <Text style={styles.signUpText}>회원가입</Text>
+                아직 회원이 아니신가요? <Text style={styles.signUpText}>회원가입</Text>
               </Text>
             </TouchableOpacity>
           </View>
@@ -145,42 +174,15 @@ export default function LoginScreen() {
 }
 
 const styles = StyleSheet.create({
-  safeArea: {
-    flex: 1,
-    backgroundColor: '#FFFFFF',
-  },
-  scroll: {
-    flex: 1,
-  },
-  header: {
-    paddingHorizontal: 20,
-    marginTop: 44,
-  },
-  title: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: '#111111',
-  },
-  logoWrapper: {
-    alignItems: 'center',
-    marginTop: 16,
-  },
-  logo: {
-    height: 80,
-    resizeMode: 'contain',
-    marginBottom: 12,
-  },
-  form: {
-    paddingHorizontal: 20,
-  },
-  label: {
-    fontSize: 14,
-    marginBottom: 9,
-    color: '#111111',
-  },
-  passwordLabel: {
-    marginTop: 16,
-  },
+  safeArea: { flex: 1, backgroundColor: '#FFFFFF' },
+  scroll: { flex: 1 },
+  header: { paddingHorizontal: 20, marginTop: 44 },
+  title: { fontSize: 20, fontWeight: 'bold', color: '#111111' },
+  logoWrapper: { alignItems: 'center', marginTop: 16 },
+  logo: { height: 80, resizeMode: 'contain', marginBottom: 12 },
+  form: { paddingHorizontal: 20 },
+  label: { fontSize: 14, marginBottom: 9, color: '#111111' },
+  passwordLabel: { marginTop: 16 },
   inputWrapper: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -201,6 +203,9 @@ const styles = StyleSheet.create({
     width: 28,
     height: 28,
     resizeMode: 'contain',
+  },
+  iconSpacing: {
+    marginRight: 8,
   },
   optionRow: {
     flexDirection: 'row',
@@ -240,12 +245,26 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: 'bold',
   },
+  divider: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginVertical: 24,
+  },
+  line: {
+    flex: 1,
+    height: 1,
+    backgroundColor: '#E5E5EC',
+  },
+  orText: {
+    marginHorizontal: 12,
+    color: '#767676',
+    fontSize: 14,
+  },
   kakaoButton: {
     backgroundColor: '#FEE500',
     borderRadius: 12,
     alignItems: 'center',
     paddingVertical: 14,
-    marginTop: 12,
     flexDirection: 'row',
     justifyContent: 'center',
   },
