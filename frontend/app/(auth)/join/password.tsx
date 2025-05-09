@@ -26,6 +26,9 @@ export default function PasswordSetupScreen() {
     /\d/.test(pw) &&
     /[^a-zA-Z0-9]/.test(pw);
 
+  const isValid = isValidPassword(password);
+  const showValidation = password.length > 0;
+
   useEffect(() => {
     const backAction = () => true;
     const backHandler = BackHandler.addEventListener('hardwareBackPress', backAction);
@@ -38,7 +41,7 @@ export default function PasswordSetupScreen() {
       return;
     }
 
-    if (!isValidPassword(password)) {
+    if (!isValid) {
       Alert.alert('오류', '비밀번호는 영어, 숫자, 특수문자를 포함한 8~12자여야 합니다.');
       return;
     }
@@ -61,6 +64,12 @@ export default function PasswordSetupScreen() {
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
+        <TouchableOpacity onPress={() => router.back()}>
+          <Image
+            source={require('@/assets/images/item-actionbutton-navigation-bar-left.png')}
+            style={styles.backIcon}
+          />
+        </TouchableOpacity>
         <Text style={styles.title}>회원가입</Text>
       </View>
 
@@ -72,7 +81,12 @@ export default function PasswordSetupScreen() {
           영어, 숫자, 특수문자를 포함한 8~12자를 입력해 주세요!
         </Text>
 
-        <View style={styles.inputWrapper}>
+        <View
+          style={[
+            styles.inputWrapper,
+            showValidation && (isValid ? styles.validInput : styles.invalidInput),
+          ]}
+        >
           <TextInput
             placeholder="비밀번호를 입력해 주세요"
             secureTextEntry={!showPassword}
@@ -92,18 +106,26 @@ export default function PasswordSetupScreen() {
           </TouchableOpacity>
         </View>
 
+        {showValidation && (
+          <Text style={isValid ? styles.validText : styles.invalidText}>
+            {isValid
+              ? '사용 가능한 비밀번호입니다.'
+              : '영어, 숫자, 특수문자를 포함한 8~12자를 입력해 주세요.'}
+          </Text>
+        )}
+
         <TouchableOpacity
           style={[
             styles.button,
-            { backgroundColor: isValidPassword(password) ? '#2379FA' : '#F7F7FB' },
+            { backgroundColor: isValid ? '#2379FA' : '#F7F7FB' },
           ]}
           onPress={handleComplete}
-          disabled={!isValidPassword(password) || loading}
+          disabled={!isValid || loading}
         >
           <Text
             style={[
               styles.buttonText,
-              { color: isValidPassword(password) ? '#fff' : '#999999' },
+              { color: isValid ? '#fff' : '#999999' },
             ]}
           >
             {loading ? '처리 중...' : '완료'}
@@ -121,10 +143,14 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingTop: 44,
     paddingHorizontal: 20,
-    justifyContent: 'center',
   },
   backIcon: { width: 36, height: 44 },
-  title: { fontSize: 20, fontWeight: 'bold', color: '#111' },
+  title: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: '#111',
+    marginLeft: 12,
+  },
   progressBar: {
     height: 6,
     backgroundColor: '#2379FA',
@@ -155,7 +181,15 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     paddingHorizontal: 16,
     paddingVertical: 4,
-    marginBottom: 32,
+    marginBottom: 8,
+  },
+  validInput: {
+    borderColor: '#00C851',
+    borderWidth: 1.5,
+  },
+  invalidInput: {
+    borderColor: '#FF4444',
+    borderWidth: 1.5,
   },
   input: {
     flex: 1,
@@ -167,6 +201,16 @@ const styles = StyleSheet.create({
     width: 28,
     height: 28,
     resizeMode: 'contain',
+  },
+  validText: {
+    color: '#00C851',
+    fontSize: 13,
+    marginBottom: 20,
+  },
+  invalidText: {
+    color: '#FF4444',
+    fontSize: 13,
+    marginBottom: 20,
   },
   button: {
     borderRadius: 12,
