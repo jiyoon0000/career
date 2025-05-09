@@ -35,21 +35,24 @@ export default function VerificationCodeScreen() {
   }, []);
 
   const formatTime = (seconds: number) => {
-    const m = Math.floor(seconds / 60)
-      .toString()
-      .padStart(2, '0');
+    const m = Math.floor(seconds / 60).toString().padStart(2, '0');
     const s = (seconds % 60).toString().padStart(2, '0');
     return `${m}:${s}`;
   };
 
   const handleVerify = async () => {
-    if (!code) {
-      Alert.alert('인증코드를 입력해 주세요.');
+    if (!/^\d{6}$/.test(code)) {
+      Alert.alert('인증코드는 6자리 숫자여야 합니다.');
       return;
     }
 
     try {
-      await verifyEmailCode({ email, code });
+      const result = await verifyEmailCode({ email, code });
+
+      if (!result?.data) {
+        Alert.alert('인증 실패', '인증코드가 유효하지 않습니다.');
+        return;
+      }
 
       router.push({
         pathname: '/(auth)/join/password',
@@ -57,8 +60,8 @@ export default function VerificationCodeScreen() {
       });
     } catch (error: any) {
       Alert.alert(
-        '인증 실패',
-        error.response?.data?.message || '인증코드가 올바르지 않습니다.'
+          '인증 실패',
+          error.response?.data?.message || '서버 오류가 발생했습니다.'
       );
     }
   };
@@ -74,61 +77,64 @@ export default function VerificationCodeScreen() {
     }
   };
 
+  const isCodeValid = /^\d{6}$/.test(code);
+
   return (
-    <SafeAreaView style={styles.container}>
-      <View style={styles.header}>
-        <TouchableOpacity onPress={() => router.back()}>
-          <Image
-            source={require('@/assets/images/item-actionbutton-navigation-bar-left.png')}
-            style={styles.backIcon}
-          />
-        </TouchableOpacity>
-        <Text style={styles.title}>회원가입</Text>
-      </View>
-
-      <View style={styles.progressBar}>
-        <View style={styles.progress} />
-      </View>
-
-      <View style={styles.content}>
-        <Text style={styles.heading}>
-          이메일로 발송된{'\n'}인증코드를 입력해 주세요
-        </Text>
-        <Text style={styles.sub}>
-          {email ? `${email} 으로 보냈어요! 유효시간 ${formatTime(timer)}` : '이메일을 불러올 수 없습니다.'}
-        </Text>
-
-        <View style={styles.inputWrapper}>
-          <TextInput
-            placeholder="인증코드를 입력해 주세요"
-            value={code}
-            onChangeText={setCode}
-            keyboardType="number-pad"
-            style={styles.input}
-          />
+      <SafeAreaView style={styles.container}>
+        <View style={styles.header}>
+          <TouchableOpacity onPress={() => router.back()}>
+            <Image
+                source={require('@/assets/images/item-actionbutton-navigation-bar-left.png')}
+                style={styles.backIcon}
+            />
+          </TouchableOpacity>
+          <Text style={styles.title}>회원가입</Text>
         </View>
 
-        <View style={styles.resendRow}>
-          <Text style={styles.resendText}>인증코드 메일이 오지 않았나요?</Text>
-          <TouchableOpacity onPress={handleResend}>
-            <Text style={styles.resendButton}>재전송</Text>
+        <View style={styles.progressBar}>
+          <View style={styles.progress} />
+        </View>
+
+        <View style={styles.content}>
+          <Text style={styles.heading}>
+            이메일로 발송된{'\n'}인증코드를 입력해 주세요
+          </Text>
+          <Text style={styles.sub}>
+            {email ? `${email} 으로 보냈어요! 유효시간 ${formatTime(timer)}` : '이메일을 불러올 수 없습니다.'}
+          </Text>
+
+          <View style={styles.inputWrapper}>
+            <TextInput
+                placeholder="인증코드를 입력해 주세요"
+                value={code}
+                onChangeText={text => setCode(text.replace(/[^0-9]/g, ''))}
+                keyboardType="number-pad"
+                style={styles.input}
+                maxLength={6}
+            />
+          </View>
+
+          <View style={styles.resendRow}>
+            <Text style={styles.resendText}>인증코드 메일이 오지 않았나요?</Text>
+            <TouchableOpacity onPress={handleResend}>
+              <Text style={styles.resendButton}>재전송</Text>
+            </TouchableOpacity>
+          </View>
+
+          <TouchableOpacity
+              style={[
+                styles.button,
+                { backgroundColor: isCodeValid ? '#2379FA' : '#F7F7FB' },
+              ]}
+              onPress={handleVerify}
+              disabled={!isCodeValid}
+          >
+            <Text style={[styles.buttonText, { color: isCodeValid ? '#fff' : '#999' }]}>
+              인증코드 확인
+            </Text>
           </TouchableOpacity>
         </View>
-
-        <TouchableOpacity
-          style={[
-            styles.button,
-            { backgroundColor: code ? '#2379FA' : '#F7F7FB' },
-          ]}
-          onPress={handleVerify}
-          disabled={!code}
-        >
-          <Text style={[styles.buttonText, { color: code ? '#fff' : '#999' }]}>
-            인증코드 확인
-          </Text>
-        </TouchableOpacity>
-      </View>
-    </SafeAreaView>
+      </SafeAreaView>
   );
 }
 

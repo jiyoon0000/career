@@ -19,8 +19,11 @@ export default function EmailInputScreen() {
   const handleSendCode = async () => {
     try {
       setLoading(true);
+      console.log('이메일 전송 시작', email);
 
-      const res = await sendVerificationCode({ email });  
+      const res = await sendVerificationCode({ email });
+      console.log('응답 성공', res);
+  
       Alert.alert('성공', res.message || '인증코드를 전송했어요!');
   
       console.log('➡️ 라우팅 이동 시작');
@@ -29,9 +32,11 @@ export default function EmailInputScreen() {
         params: { email },
       });
     } catch (error: any) {
+      console.error('에러 발생', error);
       Alert.alert('오류', error.response?.data?.message || '인증코드 전송 실패');
     } finally {
       setLoading(false);
+      console.log('로딩 종료');
     }
   };
   
@@ -41,7 +46,7 @@ export default function EmailInputScreen() {
       <View style={styles.header}>
         <TouchableOpacity onPress={() => router.back()}>
           <Image
-            source={require('@/assets/images/item-actionbutton-navigation-bar-left.png')}
+            source={require('@/assets/images/item-actionbutton-navigation-bar-left.svg')}
             style={styles.backIcon}
           />
         </TouchableOpacity>
