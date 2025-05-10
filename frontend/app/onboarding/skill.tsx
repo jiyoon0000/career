@@ -7,6 +7,7 @@ import {
   ScrollView,
   StyleSheet,
   Alert,
+  Image,
 } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { recommendSkills, saveSelectedSkills } from '@/api/Onboarding';
@@ -45,7 +46,7 @@ export default function OnboardingSkillScreen() {
   const handleComplete = async () => {
     try {
       await saveSelectedSkills(selectedSkills);
-      router.push('/(tabs)');
+      router.push('/onboarding/certificate');
     } catch (e) {
       Alert.alert('스킬 저장 실패', '선택한 스킬 저장에 실패했어요.');
     }
@@ -87,7 +88,18 @@ export default function OnboardingSkillScreen() {
             </TouchableOpacity>
           ))}
         </View>
-
+        <View style={styles.infoBox}>
+          <Image
+            source={require('@/assets/images/tossface-qurious-100.png')}
+            style={styles.infoImage}
+            resizeMode="contain"
+          />
+          <Text style={styles.infoTitle}>원하는 역량이 보이지 않나요?</Text>
+          <Text style={styles.infoText}>
+            관련 데이터가 충분하지 않을 경우, 원하는 추천 역량이 보이지 않을 수 있어요.{"\n"}
+            나중에 커리어셋 화면에서 원하는 역량을 직접 추가할 수 있어요!
+          </Text>
+        </View>
         <TouchableOpacity
           style={[
             styles.button,
@@ -183,5 +195,31 @@ const styles = StyleSheet.create({
   buttonText: {
     fontSize: 16,
     fontWeight: '700',
+  },
+  infoBox: {
+    backgroundColor: '#F7F7FB',
+    borderRadius: 12,
+    paddingVertical: 20,
+    paddingHorizontal: 16,
+    marginHorizontal: 20,
+    marginTop: 24,
+    alignItems: 'center',
+  },
+  infoImage: {
+    width: 48,
+    height: 48,
+    marginBottom: 12,
+  },
+  infoTitle: {
+    fontSize: 14,
+    fontWeight: 'bold',
+    color: '#111111',
+    marginBottom: 6,
+  },
+  infoText: {
+    fontSize: 14,
+    color: '#767676',
+    lineHeight: 22,
+    textAlign: 'center',
   },
 });
