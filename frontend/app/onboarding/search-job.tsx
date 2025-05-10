@@ -122,15 +122,15 @@ export default function OnboardingJobScreen() {
               <TouchableOpacity
                 style={[
                   styles.resultItem,
-                  isSelected && styles.selectedItemGray, // 회색 배경 적용
+                  isSelected && styles.selectedItemGray, 
                 ]}
-                onPress={() => setSelectedJob(isSelected ? null : item)} // 다시 누르면 해제
+                onPress={() => setSelectedJob(isSelected ? null : item)} 
               >
                 <View style={styles.resultItemContent}>
                   {highlightKeyword(item.name)}
                   {isSelected && (
                     <Image
-                      source={require('@/assets/images/checkbox.png')} // 체크 이미지 파일
+                      source={require('@/assets/images/checkbox.png')}
                       style={styles.checkIcon}
                     />
                   )}
