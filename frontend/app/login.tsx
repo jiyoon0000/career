@@ -13,6 +13,9 @@ import {
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { login } from '@/api/Auth';
+import axios from 'axios';
+
+const API = process.env.EXPO_PUBLIC_API_BASE_URL;
 
 export default function LoginScreen() {
   const [email, setEmail] = useState('');
@@ -23,18 +26,25 @@ export default function LoginScreen() {
   const handleLogin = async () => {
     try {
       const res = await login({ email, password });
-      await AsyncStorage.setItem('accessToken', res.accessToken);
+      const accessToken = res.accessToken;
+      await AsyncStorage.setItem('accessToken', accessToken);
 
       if (autoLoginChecked) {
         await AsyncStorage.setItem('autoLogin', 'true');
       }
 
-      const isFirstLogin = await AsyncStorage.getItem('hasOnboarded');
-      if (!isFirstLogin) {
-        await AsyncStorage.setItem('hasOnboarded', 'true');
-        router.replace('/onboarding/StartScreen');
-      } else {
+      const onboardingRes = await axios.get(`${API}/api/onboarding/completed`, {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
+
+      const isCompleted = onboardingRes.data.data.completed;
+
+      if (isCompleted) {
         router.replace('/(tabs)');
+      } else {
+        router.replace('/onboarding/StartScreen');
       }
     } catch (error) {
       Alert.alert('로그인 실패', '이메일 또는 비밀번호가 올바르지 않습니다.');
@@ -82,7 +92,6 @@ export default function LoginScreen() {
               style={styles.textInput}
               secureTextEntry={!showPassword}
             />
-
             {password.length > 0 ? (
               <>
                 <TouchableOpacity onPress={() => setShowPassword(!showPassword)} style={{ marginRight: 1 }}>
@@ -115,7 +124,6 @@ export default function LoginScreen() {
               </TouchableOpacity>
             )}
           </View>
-
 
           <View style={styles.optionRow}>
             <TouchableOpacity
