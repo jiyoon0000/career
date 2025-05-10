@@ -6,7 +6,7 @@ export default function StartScreen() {
   const router = useRouter();
 
   const handlePress = () => {
-    router.push('/(tabs)');
+    router.push('/onboarding/search-job');
   };
 
   return (
