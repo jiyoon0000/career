@@ -45,6 +45,22 @@ export async function saveSelectedSkills(skills: string[]) {
   return res.data;
 }
 
+export async function recommendCertificates() {
+  const headers = await getAuthHeader();
+  const res = await axios.get(`${API}/api/onboarding/certificates/recommend`, { headers });
+  return res.data.data;
+}
+
+export async function saveSelectedCertificates(certificates: string[]) {
+  const headers = await getAuthHeader();
+  const res = await axios.post(
+    `${API}/api/onboarding/certificates`,
+    { certificates },
+    { headers }
+  );
+  return res.data;
+}
+
 export async function checkOnboardingCompleted() {
   const headers = await getAuthHeader();
   const res = await axios.get(`${API}/api/onboarding/completed`, { headers });

@@ -89,14 +89,17 @@ export default function OnboardingSkillScreen() {
           ))}
         </View>
         <View style={styles.infoBox}>
-          <Image
-            source={require('@/assets/images/tossface-qurious-100.png')}
-            style={styles.infoImage}
-            resizeMode="contain"
-          />
-          <Text style={styles.infoTitle}>원하는 역량이 보이지 않나요?</Text>
+          <View style={styles.infoTitleRow}>
+            <Image
+              source={require('@/assets/images/tossface-qurious-100.png')}
+              style={styles.infoImage}
+              resizeMode="contain"
+            />
+            <Text style={styles.infoTitle}>원하는 역량이 보이지 않나요?</Text>
+          </View>
+
           <Text style={styles.infoText}>
-            관련 데이터가 충분하지 않을 경우, 원하는 추천 역량이 보이지 않을 수 있어요.{"\n"}
+            관련 데이터가 충분하지 않을 경우, 원하는 추천 역량이 보이지 않을 수 있어요.
             나중에 커리어셋 화면에서 원하는 역량을 직접 추가할 수 있어요!
           </Text>
         </View>
@@ -203,23 +206,28 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     marginHorizontal: 20,
     marginTop: 24,
-    alignItems: 'center',
-  },
-  infoImage: {
-    width: 48,
-    height: 48,
-    marginBottom: 12,
-  },
-  infoTitle: {
-    fontSize: 14,
-    fontWeight: 'bold',
-    color: '#111111',
-    marginBottom: 6,
+    alignItems: 'flex-start',
   },
   infoText: {
     fontSize: 14,
     color: '#767676',
     lineHeight: 22,
-    textAlign: 'center',
+    textAlign: 'left',
+    alignSelf: 'stretch'
+  },
+  infoTitleRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 6,
+  },
+  infoImage: {
+    width: 24,
+    height: 24,
+    marginRight: 8,
+  },
+  infoTitle: {
+    fontSize: 14,
+    fontWeight: 'bold',
+    color: '#111111',
   },
 });

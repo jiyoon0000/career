@@ -41,6 +41,8 @@ export default function RootLayout() {
 
         <Stack.Screen name="onboarding/SplashScreen" options={{ headerShown: false }} />
         <Stack.Screen name="onboarding/StartScreen" options={{ headerShown: false }} />
+        <Stack.Screen name="onboarding/loading" options={{ headerShown: false }} />
+
       </Stack>
       <StatusBar style="auto" />
     </ThemeProvider>
