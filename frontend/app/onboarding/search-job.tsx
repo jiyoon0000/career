@@ -8,9 +8,10 @@ import {
   Image,
   FlatList,
   StyleSheet,
+  Alert,
 } from 'react-native';
 import { useRouter } from 'expo-router';
-import { searchJobs } from '@/api/Onboarding';
+import { searchJobs, saveSelectedJob } from '@/api/Onboarding';
 
 export default function OnboardingJobScreen() {
   const router = useRouter();
@@ -31,12 +32,18 @@ export default function OnboardingJobScreen() {
     return () => clearTimeout(delayDebounce);
   }, [keyword]);
 
-  const handleComplete = () => {
+  const handleComplete = async () => {
     if (!selectedJob) return;
-    router.push({
-      pathname: '/onboarding/skill',
-      params: { jobName: selectedJob.name },
-    });
+  
+    try {
+      await saveSelectedJob(selectedJob.code); 
+      router.push({
+        pathname: '/onboarding/skill',
+        params: { jobName: selectedJob.name },
+      });
+    } catch (e) {
+      Alert.alert('직무 저장 실패', '직무 저장 중 오류가 발생했어요.');
+    }
   };
 
   const highlightKeyword = (text: string) => {
@@ -224,8 +231,8 @@ const styles = StyleSheet.create({
     backgroundColor: '#F1F1F5',
   },
   checkIcon: {
-    width: 30,
-    height: 30,
+    width: 20,
+    height: 20,
     resizeMode: 'contain',
   },
   clearIcon: {
