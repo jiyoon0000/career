@@ -15,3 +15,20 @@ export async function fetchStudyRooms() {
   const res = await axios.get(`${API}/api/study-rooms`, { headers });
   return res.data.data;
 }
+
+export const fetchFilteredStudyRooms = async (region?: string, payType?: string) => {
+    const headers = await getAuthHeader();
+    const params: Record<string, string> = {};
+    if (region) params.region = region;
+    if (payType) params.payType = payType;
+  
+    const res = await axios.get(`${API}/api/study-rooms/filter`, { params, headers });
+    return res.data.data;
+  };
+  
+  export const fetchStudyRoomRegions = async () => {
+    const headers = await getAuthHeader();
+    const res = await axios.get(`${API}/api/study-rooms/regions`, { headers });
+    return res.data.data;
+  };
+  

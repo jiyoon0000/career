@@ -1,15 +1,16 @@
 import React, { useEffect, useState } from 'react';
 import {
   SafeAreaView,
-  Text,
   View,
+  Text,
   Image,
   TouchableOpacity,
   FlatList,
   StyleSheet,
   Alert,
 } from 'react-native';
-import { fetchStudyRooms } from '@/api/StudyRoom';
+import Modal from 'react-native-modal';
+import { fetchFilteredStudyRooms, fetchStudyRoomRegions } from '@/api/StudyRoom';
 
 type StudyRoom = {
   id: number;
@@ -20,19 +21,40 @@ type StudyRoom = {
   imageUrl: string;
 };
 
+const payTypes = ['무료', '유료'];
+
 export default function StudyRoomScreen() {
   const [studyRooms, setStudyRooms] = useState<StudyRoom[]>([]);
+  const [regions, setRegions] = useState<string[]>([]);
+  const [isModalVisible, setModalVisible] = useState(false);
+  const [selectedRegion, setSelectedRegion] = useState('');
+  const [selectedPayType, setSelectedPayType] = useState('');
+
+  const fetchRooms = async () => {
+    try {
+      const result = await fetchFilteredStudyRooms(selectedRegion, selectedPayType);
+      setStudyRooms(result);
+    } catch (e) {
+      Alert.alert('스터디룸 불러오기 실패', '데이터를 불러오지 못했습니다.');
+    }
+  };
+
+  useEffect(() => {
+    fetchRooms();
+  }, [selectedRegion, selectedPayType]);
 
   useEffect(() => {
     (async () => {
       try {
-        const result = await fetchStudyRooms();
-        setStudyRooms(result);
+        const data = await fetchStudyRoomRegions();
+        setRegions(data);
       } catch (e) {
-        Alert.alert('스터디룸 불러오기 실패', '데이터를 불러오지 못했습니다.');
+        console.error('지역 목록 불러오기 실패', e);
       }
     })();
   }, []);
+
+  const toggleModal = () => setModalVisible(!isModalVisible);
 
   return (
     <SafeAreaView style={styles.container}>
@@ -42,9 +64,7 @@ export default function StudyRoomScreen() {
           <Text style={styles.totalText}>
             총 <Text style={{ fontWeight: 'bold' }}>{studyRooms.length}</Text>개
           </Text>
-          <TouchableOpacity
-            style={styles.filterButton}
-            onPress={() => Alert.alert('필터 기능은 준비 중입니다')}>
+          <TouchableOpacity style={styles.filterButton} onPress={toggleModal}>
             <Text style={styles.filterText}>필터</Text>
             <Image source={require('@/assets/images/button-icon.png')} style={styles.filterIcon} />
           </TouchableOpacity>
@@ -79,6 +99,48 @@ export default function StudyRoomScreen() {
           )}
         />
       )}
+
+      <Modal
+        isVisible={isModalVisible}
+        onBackdropPress={toggleModal}
+        style={{ justifyContent: 'flex-end', margin: 0 }}
+      >
+        <View style={styles.modal}>
+          <Text style={styles.modalTitle}>요금</Text>
+          <View style={styles.chipGroup}>
+            {payTypes.map((type) => (
+              <TouchableOpacity
+                key={type}
+                style={[styles.chip, selectedPayType === type && styles.chipSelected]}
+                onPress={() => setSelectedPayType(type === selectedPayType ? '' : type)}
+              >
+                <Text style={[styles.chipText, selectedPayType === type && styles.chipTextSelected]}>
+                  {type}
+                </Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+
+          <Text style={styles.modalTitle}>자치구</Text>
+          <View style={styles.chipGroup}>
+            {regions.map((region) => (
+              <TouchableOpacity
+                key={region}
+                style={[styles.chip, selectedRegion === region && styles.chipSelected]}
+                onPress={() => setSelectedRegion(region === selectedRegion ? '' : region)}
+              >
+                <Text style={[styles.chipText, selectedRegion === region && styles.chipTextSelected]}>
+                  {region}
+                </Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+
+          <TouchableOpacity style={styles.applyButton} onPress={toggleModal}>
+            <Text style={styles.applyButtonText}>필터 적용</Text>
+          </TouchableOpacity>
+        </View>
+      </Modal>
     </SafeAreaView>
   );
 }
@@ -163,5 +225,50 @@ const styles = StyleSheet.create({
   freeTag: {
     backgroundColor: '#EBF3FF',
     color: '#2379FA',
+  },
+  modal: {
+    backgroundColor: '#FFFFFF',
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+    padding: 20,
+  },
+  modalTitle: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    marginBottom: 12,
+  },
+  chipGroup: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 10,
+    marginBottom: 20,
+  },
+  chip: {
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    backgroundColor: '#F0F0F0',
+    borderRadius: 20,
+  },
+  chipSelected: {
+    backgroundColor: '#2379FA',
+  },
+  chipText: {
+    fontSize: 14,
+    color: '#111111',
+  },
+  chipTextSelected: {
+    color: '#FFFFFF',
+    fontWeight: 'bold',
+  },
+  applyButton: {
+    backgroundColor: '#2379FA',
+    paddingVertical: 14,
+    borderRadius: 8,
+    alignItems: 'center',
+  },
+  applyButtonText: {
+    color: '#FFFFFF',
+    fontSize: 16,
+    fontWeight: 'bold',
   },
 });
