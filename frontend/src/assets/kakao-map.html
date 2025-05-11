@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>Kakao 지도</title>
+    <style>
+      html, body, #map {
+        height: 100%;
+        margin: 0;
+        padding: 0;
+      }
+    </style>
+    <script>
+      window.onload = () => {
+        const script = document.createElement('script');
+        script.src = "https://dapi.kakao.com/v2/maps/sdk.js?appkey=cddcab3553657dcb43f645da5b2148b8";
+        script.onload = initMap;
+        document.head.appendChild(script);
+      };
+
+      function initMap() {
+        const params = new URLSearchParams(location.search);
+        const x = parseFloat(params.get("x"));
+        const y = parseFloat(params.get("y"));
+        const name = decodeURIComponent(params.get("name"));
+
+        const mapContainer = document.getElementById("map");
+        const mapOption = {
+          center: new kakao.maps.LatLng(y, x),
+          level: 3
+        };
+        const map = new kakao.maps.Map(mapContainer, mapOption);
+
+        const marker = new kakao.maps.Marker({
+          position: new kakao.maps.LatLng(y, x)
+        });
+        marker.setMap(map);
+
+        const infowindow = new kakao.maps.InfoWindow({
+          content: `<div style="padding:6px 12px;font-size:14px;">${name}</div>`
+        });
+        infowindow.open(map, marker);
+      }
+    </script>
+  </head>
+  <body>
+    <div id="map"></div>
+  </body>
+</html>

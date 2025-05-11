@@ -17,6 +17,7 @@ import { getStudyRoomById } from '@/api/StudyRoom';
 import type { StudyRoomDetail } from '@/types/studyroom';
 
 const KAKAO_JS_KEY = process.env.EXPO_PUBLIC_KAKAO_JS_KEY;
+const API_BASE_URL = process.env.EXPO_PUBLIC_API_BASE_URL;
 
 export default function StudyRoomDetailScreen() {
   const { id } = useLocalSearchParams();
@@ -31,37 +32,6 @@ export default function StudyRoomDetailScreen() {
       .catch((err) => console.error('상세 정보 불러오기 실패', err))
       .finally(() => setLoading(false));
   }, [id]);
-
-  const KAKAO_MAP_HTML = (x: number, y: number, name: string) => `
-    <!DOCTYPE html>
-    <html>
-    <head>
-      <meta charset="utf-8" />
-      <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-      <style> html, body, #map { margin:0; padding:0; height:100%; } </style>
-      <script src="https://dapi.kakao.com/v2/maps/sdk.js?appkey=${KAKAO_JS_KEY}"></script>
-    </head>
-    <body>
-      <div id="map"></div>
-      <script>
-        var mapContainer = document.getElementById('map');
-        var mapOption = {
-          center: new kakao.maps.LatLng(${y}, ${x}),
-          level: 3
-        };
-        var map = new kakao.maps.Map(mapContainer, mapOption);
-        var marker = new kakao.maps.Marker({
-          position: new kakao.maps.LatLng(${y}, ${x})
-        });
-        marker.setMap(map);
-        var infowindow = new kakao.maps.InfoWindow({
-          content: '<div style="padding:6px 12px;font-size:14px;">${name}</div>'
-        });
-        infowindow.open(map, marker);
-      </script>
-    </body>
-    </html>
-  `;
 
   if (loading) return <ActivityIndicator style={{ flex: 1 }} />;
   if (!room) return <Text style={{ padding: 20 }}>스터디룸 정보를 불러올 수 없습니다.</Text>;
@@ -98,15 +68,16 @@ export default function StudyRoomDetailScreen() {
       <View style={styles.webviewContainer}>
         {Platform.OS === 'web' ? (
           <iframe
-            srcDoc={KAKAO_MAP_HTML(room.x, room.y, room.name)}
+            src={`${API_BASE_URL}/kakao-map.html?x=${room.x}&y=${room.y}&name=${encodeURIComponent(room.name)}`}
             width="100%"
             height="300"
             style={{ border: 'none' }}
+            allowFullScreen
           />
         ) : (
           <WebView
             originWhitelist={['*']}
-            source={{ html: KAKAO_MAP_HTML(room.x, room.y, room.name) }}
+            source={{ uri: `${API_BASE_URL}/kakao-map.html?x=${room.x}&y=${room.y}&name=${encodeURIComponent(room.name)}` }}
             style={{ height: 300 }}
           />
         )}
