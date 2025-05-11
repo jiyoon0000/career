@@ -42,7 +42,7 @@ export default function LoginScreen() {
       const isCompleted = onboardingRes.data.data.completed;
 
       if (isCompleted) {
-        router.replace('/(tabs)');
+        router.replace('/(tabs)/studyroom');
       } else {
         router.replace('/onboarding/StartScreen');
       }
