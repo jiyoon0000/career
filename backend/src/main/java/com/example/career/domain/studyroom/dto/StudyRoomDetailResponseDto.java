@@ -27,8 +27,12 @@ public class StudyRoomDetailResponseDto {
     private final String address;
 
     private final String serviceUrl;
-    
+
     private final String organizationName;
+
+    private final Double x;
+    
+    private final Double y;
 
     public StudyRoomDetailResponseDto(StudyRoom studyRoom) {
         this.id = studyRoom.getId();
@@ -43,5 +47,7 @@ public class StudyRoomDetailResponseDto {
         this.address = studyRoom.getAddress();
         this.serviceUrl = studyRoom.getServiceUrl();
         this.organizationName = studyRoom.getOrganizationName();
+        this.x = studyRoom.getX();
+        this.y = studyRoom.getY();
     }
 }
