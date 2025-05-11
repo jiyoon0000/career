@@ -51,15 +51,21 @@ export async function recommendCertificates() {
   return res.data.data;
 }
 
-export async function saveSelectedCertificates(certificates: string[]) {
+export async function saveSelectedCertificates(certificateNames: string[]) {
   const headers = await getAuthHeader();
   const res = await axios.post(
     `${API}/api/onboarding/certificates`,
-    { certificates },
+    { certificateNames },
     { headers }
   );
   return res.data;
 }
+
+export async function completeOnboarding() {
+    const headers = await getAuthHeader();
+    const res = await axios.post(`${API}/api/onboarding/complete`, {}, { headers });
+    return res.data;
+  }
 
 export async function checkOnboardingCompleted() {
   const headers = await getAuthHeader();
