@@ -9,9 +9,7 @@ import {
   StyleSheet,
   TouchableOpacity,
   Alert,
-  Platform,
 } from 'react-native';
-import MapView, { Marker } from 'react-native-maps';
 import * as Linking from 'expo-linking';
 import { WebView } from 'react-native-webview';
 import { getStudyRoomById } from '@/api/StudyRoom';
@@ -24,11 +22,6 @@ export default function StudyRoomDetailScreen() {
   const router = useRouter();
   const [room, setRoom] = useState<StudyRoomDetail | null>(null);
   const [loading, setLoading] = useState(true);
-  const [isWeb, setIsWeb] = useState(false);
-
-  useEffect(() => {
-    setIsWeb(Platform.OS === 'web');
-  }, []);
 
   useEffect(() => {
     if (!id) return;
@@ -38,14 +31,14 @@ export default function StudyRoomDetailScreen() {
       .finally(() => setLoading(false));
   }, [id]);
 
-  const KAKAO_MAP_HTML = (x: number, y: number) => `
+  const KAKAO_MAP_HTML = (x: number, y: number, name: string) => `
     <!DOCTYPE html>
     <html>
     <head>
       <meta charset="utf-8" />
       <meta name="viewport" content="initial-scale=1.0, width=device-width" />
       <style> html, body, #map { height: 100%; margin: 0; padding: 0; } </style>
-      <script src="//dapi.kakao.com/v2/maps/sdk.js?appkey=${KAKAO_JS_KEY}"></script>
+      <script src="https://dapi.kakao.com/v2/maps/sdk.js?appkey=${KAKAO_JS_KEY}"></script>
     </head>
     <body>
       <div id="map"></div>
@@ -60,6 +53,10 @@ export default function StudyRoomDetailScreen() {
           position: new kakao.maps.LatLng(${y}, ${x})
         });
         marker.setMap(map);
+        var infowindow = new kakao.maps.InfoWindow({
+          content: '<div style="padding:6px 12px;font-size:14px;">${name}</div>'
+        });
+        infowindow.open(map, marker);
       </script>
     </body>
     </html>
@@ -97,28 +94,16 @@ export default function StudyRoomDetailScreen() {
       <Text style={styles.info}>문의처: {room.contact || '정보 없음'}</Text>
 
       <Text style={styles.sectionTitle}>위치 보기</Text>
-
-      {isWeb ? (
-        <View style={styles.webviewContainer}>
-          <WebView
-            originWhitelist={['*']}
-            source={{ html: KAKAO_MAP_HTML(room.x, room.y) }}
-            style={{ height: 300 }}
-          />
-        </View>
-      ) : (
-        <MapView
-          style={styles.map}
-          initialRegion={{
-            latitude: room.y,
-            longitude: room.x,
-            latitudeDelta: 0.005,
-            longitudeDelta: 0.005,
+      <View style={styles.webviewContainer}>
+        <WebView
+          originWhitelist={['*']}
+          source={{ html: KAKAO_MAP_HTML(room.x, room.y, room.name) }}
+          style={{ height: 300 }}
+          onError={(e) => {
+            console.error('WebView Error:', e.nativeEvent);
           }}
-        >
-          <Marker coordinate={{ latitude: room.y, longitude: room.x }} title={room.name} />
-        </MapView>
-      )}
+        />
+      </View>
 
       <TouchableOpacity
         style={styles.reserveButton}
@@ -200,12 +185,6 @@ const styles = StyleSheet.create({
   info: {
     fontSize: 14,
     marginBottom: 4,
-  },
-  map: {
-    width: '100%',
-    height: 200,
-    borderRadius: 8,
-    marginTop: 8,
   },
   webviewContainer: {
     borderRadius: 8,
