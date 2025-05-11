@@ -45,7 +45,8 @@ public class SecurityConfig {
                                 "/swagger-ui.html",
                                 "/swagger-ui/**",
                                 "/actuator/health",
-                                "/api/study-rooms/save"
+                                "/api/study-rooms/save",
+                                "/kakao-map.html"
                         ).permitAll()
                         .anyRequest().authenticated()
                 )
