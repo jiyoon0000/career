@@ -12,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
@@ -35,9 +36,24 @@ public class StudyRoomController {
     }
 
     @GetMapping
-    @Operation(summary = "스터디룸 목록 조회", description = "청년공간 + 일자리카페 통합 목록 조회")
+    @Operation(summary = "스터디룸 전체 목록 조회", description = "청년공간 + 일자리카페 통합 목록 조회")
     public ResponseEntity<CommonResponseDto<List<StudyRoomResponseDto>>> getAllStudyRooms() {
         List<StudyRoomResponseDto> result = studyRoomQueryService.getAllStudyRooms();
         return ResponseEntity.ok(CommonResponseDto.success(SuccessCode.FETCH_SUCCESS, result));
+    }
+
+    @GetMapping("/filter")
+    @Operation(summary = "스터디 룸 필터링", description = "자치구 및 요금 기준으로 스터디룸 필터링")
+    public ResponseEntity<CommonResponseDto<List<StudyRoomResponseDto>>> getFilterStudyRooms(@RequestParam(required = false) String region,
+                                                                                             @RequestParam(required = false) String payType) {
+        List<StudyRoomResponseDto> result = studyRoomQueryService.getFilterStudyRooms(region, payType);
+        return ResponseEntity.ok(CommonResponseDto.success(SuccessCode.FETCH_SUCCESS, result));
+    }
+
+    @GetMapping("/regions")
+    @Operation(summary = "스터디룸 자치구 목록 조회", description = "DB에 존재하는 자치구 목록 조회")
+    public ResponseEntity<CommonResponseDto<List<String>>> getRegions() {
+        List<String> regions = studyRoomQueryService.getAllRegions();
+        return ResponseEntity.ok(CommonResponseDto.success(SuccessCode.FETCH_SUCCESS, regions));
     }
 }
