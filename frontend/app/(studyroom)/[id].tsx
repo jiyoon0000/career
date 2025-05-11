@@ -9,17 +9,26 @@ import {
   StyleSheet,
   TouchableOpacity,
   Alert,
+  Platform,
 } from 'react-native';
 import MapView, { Marker } from 'react-native-maps';
+import * as Linking from 'expo-linking';
+import { WebView } from 'react-native-webview';
 import { getStudyRoomById } from '@/api/StudyRoom';
 import type { StudyRoomDetail } from '@/types/studyroom';
-import * as Linking from 'expo-linking';
+
+const KAKAO_JS_KEY = process.env.EXPO_PUBLIC_KAKAO_JS_KEY;
 
 export default function StudyRoomDetailScreen() {
   const { id } = useLocalSearchParams();
   const router = useRouter();
   const [room, setRoom] = useState<StudyRoomDetail | null>(null);
   const [loading, setLoading] = useState(true);
+  const [isWeb, setIsWeb] = useState(false);
+
+  useEffect(() => {
+    setIsWeb(Platform.OS === 'web');
+  }, []);
 
   useEffect(() => {
     if (!id) return;
@@ -29,13 +38,43 @@ export default function StudyRoomDetailScreen() {
       .finally(() => setLoading(false));
   }, [id]);
 
+  const KAKAO_MAP_HTML = (x: number, y: number) => `
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <meta charset="utf-8" />
+      <meta name="viewport" content="initial-scale=1.0, width=device-width" />
+      <style> html, body, #map { height: 100%; margin: 0; padding: 0; } </style>
+      <script src="//dapi.kakao.com/v2/maps/sdk.js?appkey=${KAKAO_JS_KEY}"></script>
+    </head>
+    <body>
+      <div id="map"></div>
+      <script>
+        var mapContainer = document.getElementById('map');
+        var mapOption = {
+          center: new kakao.maps.LatLng(${y}, ${x}),
+          level: 3
+        };
+        var map = new kakao.maps.Map(mapContainer, mapOption);
+        var marker = new kakao.maps.Marker({
+          position: new kakao.maps.LatLng(${y}, ${x})
+        });
+        marker.setMap(map);
+      </script>
+    </body>
+    </html>
+  `;
+
   if (loading) return <ActivityIndicator style={{ flex: 1 }} />;
   if (!room) return <Text style={{ padding: 20 }}>스터디룸 정보를 불러올 수 없습니다.</Text>;
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
       <TouchableOpacity onPress={router.back} style={styles.backButton}>
-        <Image source={require('@/assets/images/item-actionbutton-navigation-bar-left.png')} style={styles.backIcon} />
+        <Image
+          source={require('@/assets/images/item-actionbutton-navigation-bar-left.png')}
+          style={styles.backIcon}
+        />
       </TouchableOpacity>
 
       <Text style={styles.name}>{room.name}</Text>
@@ -58,20 +97,28 @@ export default function StudyRoomDetailScreen() {
       <Text style={styles.info}>문의처: {room.contact || '정보 없음'}</Text>
 
       <Text style={styles.sectionTitle}>위치 보기</Text>
-      <MapView
-        style={styles.map}
-        initialRegion={{
-          latitude: room.y,
-          longitude: room.x,
-          latitudeDelta: 0.005,
-          longitudeDelta: 0.005,
-        }}
-      >
-        <Marker
-          coordinate={{ latitude: room.y, longitude: room.x }}
-          title={room.name}
-        />
-      </MapView>
+
+      {isWeb ? (
+        <View style={styles.webviewContainer}>
+          <WebView
+            originWhitelist={['*']}
+            source={{ html: KAKAO_MAP_HTML(room.x, room.y) }}
+            style={{ height: 300 }}
+          />
+        </View>
+      ) : (
+        <MapView
+          style={styles.map}
+          initialRegion={{
+            latitude: room.y,
+            longitude: room.x,
+            latitudeDelta: 0.005,
+            longitudeDelta: 0.005,
+          }}
+        >
+          <Marker coordinate={{ latitude: room.y, longitude: room.x }} title={room.name} />
+        </MapView>
+      )}
 
       <TouchableOpacity
         style={styles.reserveButton}
@@ -86,7 +133,6 @@ export default function StudyRoomDetailScreen() {
         <Text style={styles.reserveButtonText}>예약하러 가기</Text>
       </TouchableOpacity>
     </ScrollView>
-
   );
 }
 
@@ -161,6 +207,12 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     marginTop: 8,
   },
+  webviewContainer: {
+    borderRadius: 8,
+    overflow: 'hidden',
+    marginTop: 8,
+    marginBottom: 20,
+  },
   reserveButton: {
     marginTop: 20,
     backgroundColor: '#2379FA',
@@ -173,5 +225,4 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: 'bold',
   },
-
 });
