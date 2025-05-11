@@ -49,7 +49,7 @@ export default function StudyRoomScreen() {
           <Text style={styles.emptyText}>조건에 맞는 스터디룸이 없어요.</Text>
           <Text style={styles.emptySubText}>적합한 필터를 넣어보세요.</Text>
           <TouchableOpacity style={styles.blueButton}>
-            <Text style={styles.blueButtonText}>이전 넘기기</Text>
+            <Text style={styles.blueButtonText}>의견 남기기</Text>
           </TouchableOpacity>
         </View>
       </SafeAreaView>
