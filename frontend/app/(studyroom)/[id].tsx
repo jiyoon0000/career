@@ -8,9 +8,12 @@ import {
   Image,
   StyleSheet,
   TouchableOpacity,
+  Alert,
 } from 'react-native';
+import MapView, { Marker } from 'react-native-maps';
 import { getStudyRoomById } from '@/api/StudyRoom';
 import type { StudyRoomDetail } from '@/types/studyroom';
+import * as Linking from 'expo-linking';
 
 export default function StudyRoomDetailScreen() {
   const { id } = useLocalSearchParams();
@@ -31,7 +34,6 @@ export default function StudyRoomDetailScreen() {
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
-      {/* 뒤로가기 버튼 */}
       <TouchableOpacity onPress={router.back} style={styles.backButton}>
         <Image source={require('@/assets/images/item-actionbutton-navigation-bar-left.png')} style={styles.backIcon} />
       </TouchableOpacity>
@@ -54,14 +56,44 @@ export default function StudyRoomDetailScreen() {
       <Text style={styles.info}>운영 시간: {room.openingHours || '정보 없음'}</Text>
       <Text style={styles.info}>주소: {room.address || '정보 없음'}</Text>
       <Text style={styles.info}>문의처: {room.contact || '정보 없음'}</Text>
+
+      <Text style={styles.sectionTitle}>위치 보기</Text>
+      <MapView
+        style={styles.map}
+        initialRegion={{
+          latitude: room.y,
+          longitude: room.x,
+          latitudeDelta: 0.005,
+          longitudeDelta: 0.005,
+        }}
+      >
+        <Marker
+          coordinate={{ latitude: room.y, longitude: room.x }}
+          title={room.name}
+        />
+      </MapView>
+
+      <TouchableOpacity
+        style={styles.reserveButton}
+        onPress={() => {
+          if (room.serviceUrl) {
+            Linking.openURL(room.serviceUrl);
+          } else {
+            Alert.alert('예약 링크가 없습니다');
+          }
+        }}
+      >
+        <Text style={styles.reserveButtonText}>예약하러 가기</Text>
+      </TouchableOpacity>
     </ScrollView>
+
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     padding: 20,
-    paddingTop: 60, // back button 공간 확보
+    paddingTop: 60,
     backgroundColor: '#fff',
   },
   backButton: {
@@ -123,4 +155,23 @@ const styles = StyleSheet.create({
     fontSize: 14,
     marginBottom: 4,
   },
+  map: {
+    width: '100%',
+    height: 200,
+    borderRadius: 8,
+    marginTop: 8,
+  },
+  reserveButton: {
+    marginTop: 20,
+    backgroundColor: '#2379FA',
+    paddingVertical: 14,
+    borderRadius: 8,
+    alignItems: 'center',
+  },
+  reserveButtonText: {
+    color: '#FFFFFF',
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+
 });
