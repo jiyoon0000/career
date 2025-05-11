@@ -9,6 +9,7 @@ import {
   StyleSheet,
   TouchableOpacity,
   Alert,
+  Platform,
 } from 'react-native';
 import * as Linking from 'expo-linking';
 import { WebView } from 'react-native-webview';
@@ -36,8 +37,8 @@ export default function StudyRoomDetailScreen() {
     <html>
     <head>
       <meta charset="utf-8" />
-      <meta name="viewport" content="initial-scale=1.0, width=device-width" />
-      <style> html, body, #map { height: 100%; margin: 0; padding: 0; } </style>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <style> html, body, #map { margin:0; padding:0; height:100%; } </style>
       <script src="https://dapi.kakao.com/v2/maps/sdk.js?appkey=${KAKAO_JS_KEY}"></script>
     </head>
     <body>
@@ -95,14 +96,20 @@ export default function StudyRoomDetailScreen() {
 
       <Text style={styles.sectionTitle}>위치 보기</Text>
       <View style={styles.webviewContainer}>
-        <WebView
-          originWhitelist={['*']}
-          source={{ html: KAKAO_MAP_HTML(room.x, room.y, room.name) }}
-          style={{ height: 300 }}
-          onError={(e) => {
-            console.error('WebView Error:', e.nativeEvent);
-          }}
-        />
+        {Platform.OS === 'web' ? (
+          <iframe
+            srcDoc={KAKAO_MAP_HTML(room.x, room.y, room.name)}
+            width="100%"
+            height="300"
+            style={{ border: 'none' }}
+          />
+        ) : (
+          <WebView
+            originWhitelist={['*']}
+            source={{ html: KAKAO_MAP_HTML(room.x, room.y, room.name) }}
+            style={{ height: 300 }}
+          />
+        )}
       </View>
 
       <TouchableOpacity
