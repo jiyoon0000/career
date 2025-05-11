@@ -31,4 +31,11 @@ export const fetchFilteredStudyRooms = async (region?: string, payType?: string)
     const res = await axios.get(`${API}/api/study-rooms/regions`, { headers });
     return res.data.data;
   };
+
+  export const getStudyRoomById = async (id: number) => {
+    const headers = await getAuthHeader();
+    const res = await axios.get(`${API}/api/study-rooms/${id}`, { headers });
+    return res.data.data;
+  };
+  
   

@@ -11,6 +11,7 @@ import {
 } from 'react-native';
 import Modal from 'react-native-modal';
 import { fetchFilteredStudyRooms, fetchStudyRoomRegions } from '@/api/StudyRoom';
+import { useRouter } from 'expo-router';
 
 type StudyRoom = {
   id: number;
@@ -30,6 +31,7 @@ export default function StudyRoomScreen() {
   const [selectedRegion, setSelectedRegion] = useState('');
   const [selectedPayType, setSelectedPayType] = useState('');
   const [previewCount, setPreviewCount] = useState<number | null>(null);
+  const router = useRouter();
 
   const fetchRooms = async () => {
     try {
@@ -101,17 +103,19 @@ export default function StudyRoomScreen() {
           data={studyRooms}
           keyExtractor={(item) => item.id.toString()}
           renderItem={({ item }) => (
-            <View style={styles.card}>
-              <Image source={{ uri: item.imageUrl }} style={styles.cardImage} />
-              <View style={styles.cardContent}>
-                <Text style={styles.category}>{item.category}</Text>
-                <Text style={styles.cardTitle}>{item.name}</Text>
-                <View style={styles.tagContainer}>
-                  <Text style={styles.tag}>{item.region}</Text>
-                  <Text style={[styles.tag, item.payType === '무료' && styles.freeTag]}>{item.payType}</Text>
+            <TouchableOpacity onPress={() => router.push({ pathname: '/(studyroom)/[id]', params: { id: item.id } })}>
+              <View style={styles.card}>
+                <Image source={{ uri: item.imageUrl }} style={styles.cardImage} />
+                <View style={styles.cardContent}>
+                  <Text style={styles.category}>{item.category}</Text>
+                  <Text style={styles.cardTitle}>{item.name}</Text>
+                  <View style={styles.tagContainer}>
+                    <Text style={styles.tag}>{item.region}</Text>
+                    <Text style={[styles.tag, item.payType === '무료' && styles.freeTag]}>{item.payType}</Text>
+                  </View>
                 </View>
               </View>
-            </View>
+            </TouchableOpacity>
           )}
         />
       )}
@@ -185,7 +189,7 @@ export default function StudyRoomScreen() {
           <Text style={styles.sectionTitle}>자치구</Text>
           <View style={styles.regionContainer}>
             {regions.map((region) => (
-              <TouchableOpacity 
+              <TouchableOpacity
                 key={region}
                 style={styles.regionItemContainer}
                 onPress={() => {
@@ -207,26 +211,25 @@ export default function StudyRoomScreen() {
             ))}
           </View>
 
-          {/* Footer Buttons */}
           <View style={styles.modalFooter}>
-            <TouchableOpacity 
+            <TouchableOpacity
               style={styles.resetButtonContainer}
               onPress={handleReset}
             >
-              <Image 
-                source={require('@/assets/images/button-icon-reset.png')} 
-                style={styles.resetIcon} 
+              <Image
+                source={require('@/assets/images/button-icon-reset.png')}
+                style={styles.resetIcon}
               />
               <Text style={styles.resetButtonText}>초기화</Text>
             </TouchableOpacity>
-            
-            <TouchableOpacity 
-              style={styles.applyButton} 
+
+            <TouchableOpacity
+              style={styles.applyButton}
               onPress={toggleModal}
             >
               <Text style={styles.applyButtonText}>
-                {previewCount !== null 
-                  ? `${previewCount}개 결과보기` 
+                {previewCount !== null
+                  ? `${previewCount}개 결과보기`
                   : `${studyRooms.length}개 결과보기`}
               </Text>
             </TouchableOpacity>
@@ -238,29 +241,29 @@ export default function StudyRoomScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { 
-    flex: 1, 
-    backgroundColor: '#FFFFFF' 
+  container: {
+    flex: 1,
+    backgroundColor: '#FFFFFF'
   },
-  header: { 
-    paddingTop: 44, 
-    paddingHorizontal: 20 
+  header: {
+    paddingTop: 44,
+    paddingHorizontal: 20
   },
-  subHeader: { 
-    marginTop: 12, 
-    marginBottom: 12, 
-    flexDirection: 'row', 
-    justifyContent: 'space-between', 
-    alignItems: 'center' 
+  subHeader: {
+    marginTop: 12,
+    marginBottom: 12,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center'
   },
-  title: { 
-    fontSize: 20, 
-    fontWeight: 'bold', 
-    color: '#111111' 
+  title: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: '#111111'
   },
-  totalText: { 
-    fontSize: 14, 
-    color: '#111111' 
+  totalText: {
+    fontSize: 14,
+    color: '#111111'
   },
   filterButton: {
     flexDirection: 'row',
@@ -271,30 +274,30 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     alignItems: 'center',
   },
-  filterText: { 
-    fontSize: 13, 
-    color: '#505050', 
-    marginRight: 4 
+  filterText: {
+    fontSize: 13,
+    color: '#505050',
+    marginRight: 4
   },
-  filterIcon: { 
-    width: 16, 
-    height: 16 
+  filterIcon: {
+    width: 16,
+    height: 16
   },
-  emptyContent: { 
-    flex: 1, 
-    justifyContent: 'center', 
-    alignItems: 'center' 
+  emptyContent: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center'
   },
-  emptyText: { 
-    fontSize: 16, 
-    fontWeight: 'bold', 
-    color: '#111111', 
-    marginBottom: 8 
+  emptyText: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#111111',
+    marginBottom: 8
   },
-  emptySubText: { 
-    fontSize: 14, 
-    color: '#767676', 
-    marginBottom: 24 
+  emptySubText: {
+    fontSize: 14,
+    color: '#767676',
+    marginBottom: 24
   },
   blueButton: {
     backgroundColor: '#2379FA',
@@ -302,42 +305,42 @@ const styles = StyleSheet.create({
     paddingHorizontal: 24,
     borderRadius: 8,
   },
-  blueButtonText: { 
-    color: '#FFFFFF', 
-    fontWeight: 'bold', 
-    fontSize: 14 
+  blueButtonText: {
+    color: '#FFFFFF',
+    fontWeight: 'bold',
+    fontSize: 14
   },
-  list: { 
-    paddingHorizontal: 20 
+  list: {
+    paddingHorizontal: 20
   },
-  card: { 
-    flexDirection: 'row', 
-    marginBottom: 20, 
-    backgroundColor: '#FFFFFF' 
+  card: {
+    flexDirection: 'row',
+    marginBottom: 20,
+    backgroundColor: '#FFFFFF'
   },
-  cardImage: { 
-    width: 100, 
-    height: 100, 
-    borderRadius: 8, 
-    marginRight: 12 
+  cardImage: {
+    width: 100,
+    height: 100,
+    borderRadius: 8,
+    marginRight: 12
   },
-  cardContent: { 
-    flex: 1, 
-    justifyContent: 'center' 
+  cardContent: {
+    flex: 1,
+    justifyContent: 'center'
   },
-  category: { 
-    fontSize: 12, 
-    color: '#767676' 
+  category: {
+    fontSize: 12,
+    color: '#767676'
   },
-  cardTitle: { 
-    fontSize: 14, 
-    fontWeight: 'bold', 
-    color: '#111111', 
-    marginBottom: 4 
+  cardTitle: {
+    fontSize: 14,
+    fontWeight: 'bold',
+    color: '#111111',
+    marginBottom: 4
   },
-  tagContainer: { 
-    flexDirection: 'row', 
-    gap: 6 
+  tagContainer: {
+    flexDirection: 'row',
+    gap: 6
   },
   tag: {
     backgroundColor: '#F7F7FB',
@@ -348,18 +351,18 @@ const styles = StyleSheet.create({
     color: '#505050',
     fontWeight: 'bold',
   },
-  freeTag: { 
-    backgroundColor: '#EBF3FF', 
-    color: '#2379FA' 
+  freeTag: {
+    backgroundColor: '#EBF3FF',
+    color: '#2379FA'
   },
-  
-  modal: { 
-    backgroundColor: '#FFFFFF', 
-    borderTopLeftRadius: 20, 
-    borderTopRightRadius: 20, 
-    paddingTop: 16, 
-    paddingBottom: 24, 
-    maxHeight: '80%' 
+
+  modal: {
+    backgroundColor: '#FFFFFF',
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+    paddingTop: 16,
+    paddingBottom: 24,
+    maxHeight: '80%'
   },
   modalHeaderContainer: {
     flexDirection: 'row',
