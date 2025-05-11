@@ -3,6 +3,8 @@ package com.example.career.domain.studyroom.service;
 import com.example.career.domain.studyroom.dto.StudyRoomResponseDto;
 import com.example.career.domain.studyroom.entity.StudyRoom;
 import com.example.career.domain.studyroom.repository.StudyRoomRepository;
+import com.example.career.global.error.errorcode.ErrorCode;
+import com.example.career.global.error.exception.NotFoundException;
 import jakarta.persistence.criteria.Predicate;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -46,6 +48,11 @@ public class StudyRoomQueryService {
 
     public List<String> getAllRegions() {
         return studyRoomRepository.findDistinctRegion();
+    }
+
+    public StudyRoom findById(Long id) {
+        return studyRoomRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException(ErrorCode.STUDY_ROOM_NOT_FOUND));
     }
 
 }

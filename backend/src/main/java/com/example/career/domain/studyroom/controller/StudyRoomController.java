@@ -1,6 +1,8 @@
 package com.example.career.domain.studyroom.controller;
 
+import com.example.career.domain.studyroom.dto.StudyRoomDetailResponseDto;
 import com.example.career.domain.studyroom.dto.StudyRoomResponseDto;
+import com.example.career.domain.studyroom.entity.StudyRoom;
 import com.example.career.domain.studyroom.service.StudyRoomCafeService;
 import com.example.career.domain.studyroom.service.StudyRoomQueryService;
 import com.example.career.domain.studyroom.service.StudyRoomReservationService;
@@ -11,6 +13,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -55,5 +58,12 @@ public class StudyRoomController {
     public ResponseEntity<CommonResponseDto<List<String>>> getRegions() {
         List<String> regions = studyRoomQueryService.getAllRegions();
         return ResponseEntity.ok(CommonResponseDto.success(SuccessCode.FETCH_SUCCESS, regions));
+    }
+
+    @GetMapping("/{id}")
+    @Operation(summary = "스터디룸 상세 조회", description = "각 스터디룸에 대한 상세 정보 조회")
+    public ResponseEntity<CommonResponseDto<StudyRoomDetailResponseDto>> getStudyRoomDetail(@PathVariable Long id) {
+        StudyRoom studyRoom = studyRoomQueryService.findById(id);
+        return ResponseEntity.ok(CommonResponseDto.success(SuccessCode.FETCH_SUCCESS, new StudyRoomDetailResponseDto(studyRoom)));
     }
 }
