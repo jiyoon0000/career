@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import {
   SafeAreaView,
-  ScrollView,
   Text,
   View,
   Image,
@@ -35,16 +34,24 @@ export default function StudyRoomScreen() {
     })();
   }, []);
 
-  if (studyRooms.length === 0) {
-    return (
-      <SafeAreaView style={styles.emptyContainer}>
-        <View style={styles.header}>
-          <Text style={styles.title}>스터디룸</Text>
-          <TouchableOpacity style={styles.filterButton} onPress={() => Alert.alert('필터 기능은 준비 중입니다')}>
+  return (
+    <SafeAreaView style={styles.container}>
+      <View style={styles.header}>
+        <Text style={styles.title}>스터디룸</Text>
+        <View style={styles.subHeader}>
+          <Text style={styles.totalText}>
+            총 <Text style={{ fontWeight: 'bold' }}>{studyRooms.length}</Text>개
+          </Text>
+          <TouchableOpacity
+            style={styles.filterButton}
+            onPress={() => Alert.alert('필터 기능은 준비 중입니다')}>
             <Text style={styles.filterText}>필터</Text>
             <Image source={require('@/assets/images/button-icon.png')} style={styles.filterIcon} />
           </TouchableOpacity>
         </View>
+      </View>
+
+      {studyRooms.length === 0 ? (
         <View style={styles.emptyContent}>
           <Text style={styles.emptyText}>조건에 맞는 스터디룸이 없어요.</Text>
           <Text style={styles.emptySubText}>적합한 필터를 넣어보세요.</Text>
@@ -52,45 +59,60 @@ export default function StudyRoomScreen() {
             <Text style={styles.blueButtonText}>의견 남기기</Text>
           </TouchableOpacity>
         </View>
-      </SafeAreaView>
-    );
-  }
-
-  return (
-    <SafeAreaView style={styles.container}>
-      <View style={styles.header}>
-        <Text style={styles.title}>스터디룸</Text>
-        <TouchableOpacity style={styles.filterButton} onPress={() => Alert.alert('필터 기능은 준비 중입니다')}>
-          <Text style={styles.filterText}>필터</Text>
-          <Image source={require('@/assets/images/button-icon.png')} style={styles.filterIcon} />
-        </TouchableOpacity>
-      </View>
-
-      <FlatList
-        contentContainerStyle={styles.list}
-        data={studyRooms}
-        keyExtractor={(item) => item.id.toString()}
-        renderItem={({ item }) => (
-          <View style={styles.card}>
-            <Image source={{ uri: item.imageUrl }} style={styles.cardImage} />
-            <View style={styles.cardContent}>
-              <Text style={styles.category}>{item.category}</Text>
-              <Text style={styles.cardTitle}>{item.name}</Text>
-              <View style={styles.tagContainer}>
-                <Text style={styles.tag}>{item.region}</Text>
-                <Text style={[styles.tag, item.payType === '무료' && styles.freeTag]}>{item.payType}</Text>
+      ) : (
+        <FlatList
+          contentContainerStyle={styles.list}
+          data={studyRooms}
+          keyExtractor={(item) => item.id.toString()}
+          renderItem={({ item }) => (
+            <View style={styles.card}>
+              <Image source={{ uri: item.imageUrl }} style={styles.cardImage} />
+              <View style={styles.cardContent}>
+                <Text style={styles.category}>{item.category}</Text>
+                <Text style={styles.cardTitle}>{item.name}</Text>
+                <View style={styles.tagContainer}>
+                  <Text style={styles.tag}>{item.region}</Text>
+                  <Text style={[styles.tag, item.payType === '무료' && styles.freeTag]}>{item.payType}</Text>
+                </View>
               </View>
             </View>
-          </View>
-        )}
-      />
+          )}
+        />
+      )}
     </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#FFFFFF' },
-  emptyContainer: { flex: 1, backgroundColor: '#FFFFFF' },
+  header: {
+    paddingTop: 44,
+    paddingHorizontal: 20,
+    backgroundColor: '#FFFFFF',
+  },
+  subHeader: {
+    marginTop: 12,
+    marginBottom: 12,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  title: { fontSize: 20, fontWeight: 'bold', color: '#111111' },
+  totalText: {
+    fontSize: 14,
+    color: '#111111',
+  },
+  filterButton: {
+    flexDirection: 'row',
+    borderColor: '#E5E5EC',
+    borderWidth: 1,
+    borderRadius: 100,
+    paddingVertical: 6,
+    paddingHorizontal: 12,
+    alignItems: 'center',
+  },
+  filterText: { fontSize: 13, color: '#505050', marginRight: 4 },
+  filterIcon: { width: 16, height: 16 },
   emptyContent: {
     flex: 1,
     justifyContent: 'center',
@@ -118,26 +140,6 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     fontSize: 14,
   },
-  header: {
-    paddingTop: 44,
-    paddingBottom: 12,
-    paddingHorizontal: 20,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  title: { fontSize: 20, fontWeight: 'bold', color: '#111111' },
-  filterButton: {
-    flexDirection: 'row',
-    borderColor: '#E5E5EC',
-    borderWidth: 1,
-    borderRadius: 100,
-    paddingVertical: 6,
-    paddingHorizontal: 12,
-    alignItems: 'center',
-  },
-  filterText: { fontSize: 13, color: '#505050', marginRight: 4 },
-  filterIcon: { width: 16, height: 16 },
   list: { paddingHorizontal: 20 },
   card: {
     flexDirection: 'row',
