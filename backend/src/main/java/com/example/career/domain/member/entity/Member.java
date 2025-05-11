@@ -1,6 +1,7 @@
 package com.example.career.domain.member.entity;
 
 import com.example.career.domain.onboarding.entity.Job;
+import com.example.career.domain.onboarding.entity.Onboarding;
 import com.example.career.global.common.SoftDeletableEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -10,6 +11,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -33,6 +35,9 @@ public class Member extends SoftDeletableEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "job_id")
     private Job job;
+
+    @OneToOne(mappedBy = "member", fetch = FetchType.LAZY)
+    private Onboarding onboarding;
 
     public Member(String email, String password) {
         this.email = email;

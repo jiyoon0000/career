@@ -1,5 +1,6 @@
 package com.example.career.domain.onboarding.controller;
 
+import com.example.career.domain.onboarding.dto.CertificateNameResponseDto;
 import com.example.career.domain.onboarding.dto.CertificateResponseDto;
 import com.example.career.domain.onboarding.dto.CertificateSelectionRequestDto;
 import com.example.career.domain.onboarding.dto.JobSelectionRequestDto;
@@ -7,6 +8,7 @@ import com.example.career.domain.onboarding.dto.JobSelectionResponseDto;
 import com.example.career.domain.onboarding.dto.OnboardingCompletionResponseDto;
 import com.example.career.domain.onboarding.dto.SkillRecommendResponseDto;
 import com.example.career.domain.onboarding.dto.SkillSelectionRequestDto;
+import com.example.career.domain.onboarding.entity.Certificate;
 import com.example.career.domain.onboarding.service.AiService;
 import com.example.career.domain.onboarding.service.CertificateFetchService;
 import com.example.career.domain.onboarding.service.OnboardingService;
@@ -28,6 +30,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/onboarding")
@@ -90,13 +93,19 @@ public class OnboardingController {
 
     @PostMapping("/certificates")
     @Operation(summary = "자격증 선택 저장", description = "사용자가 선택한 자격증을 저장")
-    public ResponseEntity<CommonResponseDto<Void>> saveSelectedCertificates(@AuthenticationPrincipal MemberDetails user,
-                                                                            @RequestBody @Valid CertificateSelectionRequestDto certificateSelectionRequestDto) {
+    public ResponseEntity<CommonResponseDto<List<CertificateNameResponseDto>>> saveSelectedCertificates(
+            @AuthenticationPrincipal MemberDetails user,
+            @RequestBody @Valid CertificateSelectionRequestDto certificateSelectionRequestDto) {
 
-        onboardingService.saveSelectedCertificates(user, certificateSelectionRequestDto.getCertificateNames());
+        List<Certificate> saved = onboardingService.saveSelectedCertificates(user, certificateSelectionRequestDto.getCertificateNames());
 
-        return ResponseEntity.ok(CommonResponseDto.success(SuccessCode.CREATE_SUCCESS, null));
+        List<CertificateNameResponseDto> result = saved.stream()
+                .map(CertificateNameResponseDto::new)
+                .collect(Collectors.toList());
+
+        return ResponseEntity.ok(CommonResponseDto.success(SuccessCode.CREATE_SUCCESS, result));
     }
+
 
     @GetMapping("/completed")
     @Operation(summary = "온보딩 완료 여부 조회", description = "직무, 스킬, 자격증(추천이 된 경우) 선택 여부를 바탕으로 온보딩 완료 여부를 반환")
@@ -105,5 +114,14 @@ public class OnboardingController {
         OnboardingCompletionResponseDto result = onboardingService.isOnboardingCompleted(user);
 
         return ResponseEntity.ok(CommonResponseDto.success(SuccessCode.FETCH_SUCCESS, result));
+    }
+
+    @PostMapping("/complete")
+    @Operation(summary = "온보딩 완료 후 데이터 저장", description = "직무, 스킬, 자격증(추천이 된 경우) 선택 여부를 바탕으로 온보딩 완료 후 데이터 저장")
+    public ResponseEntity<CommonResponseDto<Void>> completeOnboarding(@AuthenticationPrincipal MemberDetails user) {
+
+        onboardingService.markOnboardingCompleted(user);
+
+        return ResponseEntity.ok(CommonResponseDto.success(SuccessCode.UPDATE_SUCCESS, null));
     }
 }

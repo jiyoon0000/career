@@ -19,6 +19,7 @@ public enum ErrorCode {
     // NOT_FOUND
     MEMBER_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 회원을 찾을 수 없습니다."),
     JOB_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 직업을 찾을 수 없습니다."),
+    ONBOARDING_NOT_FOUND(HttpStatus.NOT_FOUND, "온보딩이 저장되지 않았습니다."),
 
     // CONFLICT
     DUPLICATE_EMAIL(HttpStatus.CONFLICT, "이미 존재하는 이메일입니다."),

@@ -12,9 +12,11 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Getter
+@NoArgsConstructor
 @Table(name = "onboarding")
 public class Onboarding extends BaseEntity {
 
@@ -31,4 +33,13 @@ public class Onboarding extends BaseEntity {
     private Job job;
 
     private Boolean isCompleted = false;
+
+    public Onboarding(Member member) {
+        this.member = member;
+        this.isCompleted = false;
+    }
+
+    public void markCompleted() {
+        this.isCompleted = true;
+    }
 }

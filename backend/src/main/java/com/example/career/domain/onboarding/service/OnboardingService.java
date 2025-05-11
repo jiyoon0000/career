@@ -10,10 +10,12 @@ import com.example.career.domain.onboarding.entity.Certificate;
 import com.example.career.domain.onboarding.entity.Job;
 import com.example.career.domain.onboarding.entity.MemberCertificate;
 import com.example.career.domain.onboarding.entity.MemberSkill;
+import com.example.career.domain.onboarding.entity.Onboarding;
 import com.example.career.domain.onboarding.repository.CertificateRepository;
 import com.example.career.domain.onboarding.repository.JobRepository;
 import com.example.career.domain.onboarding.repository.MemberCertificateRepository;
 import com.example.career.domain.onboarding.repository.MemberSkillRepository;
+import com.example.career.domain.onboarding.repository.OnboardingRepository;
 import com.example.career.global.error.errorcode.ErrorCode;
 import com.example.career.global.error.exception.BadRequestException;
 import com.example.career.global.error.exception.NotFoundException;
@@ -22,6 +24,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -34,6 +37,7 @@ public class OnboardingService {
     private final MemberSkillRepository memberSkillRepository;
     private final CertificateRepository certificateRepository;
     private final MemberCertificateRepository memberCertificateRepository;
+    private final OnboardingRepository onboardingRepository;
 
     @Transactional
     public JobSelectionResponseDto saveJobSelection(MemberDetails user, JobSelectionRequestDto jobSelectionRequestDto) {
@@ -83,21 +87,25 @@ public class OnboardingService {
     }
 
     @Transactional
-    public void saveSelectedCertificates(MemberDetails user, List<String> certificateNames) {
+    public List<Certificate> saveSelectedCertificates(MemberDetails user, List<String> certificateNames) {
         Long memberId = user.getMember().getId();
 
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new NotFoundException(ErrorCode.MEMBER_NOT_FOUND));
 
         List<Certificate> certificates = certificateRepository.findAllByNameIn(certificateNames);
+        List<Certificate> savedCertificates = new ArrayList<>();
 
         for (Certificate certificate : certificates) {
             boolean alreadyExists = memberCertificateRepository.existsByMemberAndCertificate(member, certificate);
 
             if (!alreadyExists) {
                 memberCertificateRepository.save(new MemberCertificate(member, certificate));
+                savedCertificates.add(certificate);
             }
         }
+
+        return savedCertificates;
     }
 
     public OnboardingCompletionResponseDto isOnboardingCompleted(MemberDetails user) {
@@ -126,5 +134,18 @@ public class OnboardingService {
         }
 
         return new OnboardingCompletionResponseDto(true);
+    }
+
+    @Transactional
+    public void markOnboardingCompleted(MemberDetails user) {
+        Long memberId = user.getMember().getId();
+
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new NotFoundException(ErrorCode.MEMBER_NOT_FOUND));
+
+        Onboarding onboarding = onboardingRepository.findByMember(member)
+                .orElseGet(() -> onboardingRepository.save(new Onboarding(member)));
+
+        onboarding.markCompleted();
     }
 }
