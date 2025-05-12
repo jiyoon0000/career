@@ -21,6 +21,7 @@ export default function OnboardingCertificateScreen() {
     const { jobName } = useLocalSearchParams<{ jobName: string }>();
     const [certificates, setCertificates] = useState<CertificateItem[]>([]);
     const [selected, setSelected] = useState<string[]>([]);
+    const canSubmit = certificates.length === 0 || selected.length > 0;
 
     useEffect(() => {
         (async () => {
@@ -71,6 +72,12 @@ export default function OnboardingCertificateScreen() {
                 </View>
 
                 <View style={styles.listWrapper}>
+                    {certificates.length === 0 && (
+                        <Text style={{ fontSize: 14, color: '#767676', marginBottom: 16 }}>
+                            추천된 자격증이 없어요. 이대로 저장하셔도 괜찮습니다.
+                        </Text>
+                    )}
+
                     {certificates.map(({ certificateName }) => {
                         const isSelected = selected.includes(certificateName);
                         return (
@@ -96,6 +103,7 @@ export default function OnboardingCertificateScreen() {
                     })}
                 </View>
 
+
                 <View style={styles.infoBox}>
                     <View style={styles.infoRow}>
                         <Image
@@ -113,21 +121,22 @@ export default function OnboardingCertificateScreen() {
 
                 <TouchableOpacity
                     onPress={handleSubmit}
-                    disabled={selected.length === 0}
+                    disabled={!canSubmit}
                     style={[
                         styles.button,
-                        { backgroundColor: selected.length ? '#2379FA' : '#F7F7FB' },
+                        { backgroundColor: canSubmit ? '#2379FA' : '#F7F7FB' },
                     ]}
                 >
                     <Text
                         style={[
                             styles.buttonText,
-                            { color: selected.length ? '#FFFFFF' : '#999999' },
+                            { color: canSubmit ? '#FFFFFF' : '#999999' },
                         ]}
                     >
                         목표 설정 완료하기
                     </Text>
                 </TouchableOpacity>
+
             </ScrollView>
         </SafeAreaView>
     );
