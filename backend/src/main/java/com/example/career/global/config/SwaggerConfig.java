@@ -27,7 +27,7 @@ public class SwaggerConfig {
                                 .email("rlawldbs9128@gmail.com"))
                         .license(new License()
                                 .name("Career License")
-                                .url("배포 주소 추가 예정")))
+                                .url("https://careeroom.net")))
                 .addSecurityItem(new SecurityRequirement().addList("bearerAuth"))
                 .components(new Components()
                         .addSecuritySchemes("bearerAuth",
