@@ -44,4 +44,16 @@ public class ErrorResponse {
                         method
                 ));
     }
+
+    public static ErrorResponse of(ErrorCode errorCode, String path, String method) {
+        return new ErrorResponse(
+                errorCode.getHttpStatus().value(),
+                errorCode.name(),
+                errorCode.getMessage(),
+                errorCode.getHttpStatus().name(),
+                path,
+                method
+        );
+    }
+
 }

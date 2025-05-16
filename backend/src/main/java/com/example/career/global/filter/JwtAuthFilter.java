@@ -3,10 +3,12 @@ package com.example.career.global.filter;
 import com.example.career.domain.member.entity.Member;
 import com.example.career.domain.member.repository.MemberRepository;
 import com.example.career.global.error.errorcode.ErrorCode;
-import com.example.career.global.error.exception.BadRequestException;
-import com.example.career.global.error.exception.UnAuthorizedException;
+import com.example.career.global.error.response.ErrorResponse;
 import com.example.career.global.jwt.JwtProvider;
 import com.example.career.global.security.MemberDetails;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.UnsupportedJwtException;
@@ -45,7 +47,13 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                 String email = jwtProvider.getUsernameFromToken(token);
 
                 Member member = memberRepository.findByEmail(email)
-                        .orElseThrow(() -> new UnAuthorizedException(ErrorCode.MEMBER_NOT_FOUND));
+                        .orElse(null);
+
+                if (member == null) {
+                    log.warn("Member Not Found: {}", email);
+                    setErrorResponse(httpServletResponse, ErrorCode.MEMBER_NOT_FOUND, httpServletRequest);
+                    return;
+                }
 
                 MemberDetails memberDetails = new MemberDetails(member);
 
@@ -55,22 +63,45 @@ public class JwtAuthFilter extends OncePerRequestFilter {
             }
         } catch (ExpiredJwtException e) {
             log.warn("Expired JWT token");
-            throw new UnAuthorizedException(ErrorCode.TOKEN_EXPIRED);
+            setErrorResponse(httpServletResponse, ErrorCode.TOKEN_EXPIRED, httpServletRequest);
         } catch (MalformedJwtException e) {
             log.error("Invalid JWT format");
-            throw new BadRequestException(ErrorCode.INVALID_TOKEN);
+            setErrorResponse(httpServletResponse, ErrorCode.INVALID_TOKEN, httpServletRequest);
         } catch (UnsupportedJwtException e) {
             log.error("Unsupported JWT token");
-            throw new BadRequestException(ErrorCode.INVALID_TOKEN);
+            setErrorResponse(httpServletResponse, ErrorCode.INVALID_TOKEN, httpServletRequest);
         } catch (IllegalArgumentException e) {
             log.error("JWT token is empty or null");
-            throw new BadRequestException(ErrorCode.INVALID_TOKEN);
+            setErrorResponse(httpServletResponse, ErrorCode.INVALID_TOKEN, httpServletRequest);
         } catch (SecurityException e) {
             log.error("JWT signature does not match");
+            setErrorResponse(httpServletResponse, ErrorCode.INVALID_TOKEN, httpServletRequest);
         } catch (Exception e) {
             log.error("Failed to validate JWT token", e);
+            setErrorResponse(httpServletResponse, ErrorCode.INTERNAL_SERVER_ERROR, httpServletRequest);
+            return;
         }
 
         filterChain.doFilter(httpServletRequest, httpServletResponse);
+    }
+
+    private void setErrorResponse(HttpServletResponse httpServletResponse, ErrorCode errorCode, HttpServletRequest httpServletRequest) throws IOException {
+
+        httpServletResponse.setStatus(errorCode.getStatus().value());
+        httpServletResponse.setContentType("application/json;charset=UTF-8");
+
+        ErrorResponse errorResponse = ErrorResponse.of(
+                errorCode,
+                httpServletRequest.getRequestURI(),
+                httpServletRequest.getMethod()
+        );
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.registerModule(new JavaTimeModule());
+        objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+
+        String json = objectMapper.writeValueAsString(errorResponse);
+        httpServletResponse.getWriter().write(json);
+        httpServletResponse.flushBuffer();
     }
 }
