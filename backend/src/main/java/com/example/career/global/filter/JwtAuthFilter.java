@@ -64,18 +64,23 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         } catch (ExpiredJwtException e) {
             log.warn("Expired JWT token");
             setErrorResponse(httpServletResponse, ErrorCode.TOKEN_EXPIRED, httpServletRequest);
+            return;
         } catch (MalformedJwtException e) {
             log.error("Invalid JWT format");
             setErrorResponse(httpServletResponse, ErrorCode.INVALID_TOKEN, httpServletRequest);
+            return;
         } catch (UnsupportedJwtException e) {
             log.error("Unsupported JWT token");
             setErrorResponse(httpServletResponse, ErrorCode.INVALID_TOKEN, httpServletRequest);
+            return;
         } catch (IllegalArgumentException e) {
             log.error("JWT token is empty or null");
             setErrorResponse(httpServletResponse, ErrorCode.INVALID_TOKEN, httpServletRequest);
+            return;
         } catch (SecurityException e) {
             log.error("JWT signature does not match");
             setErrorResponse(httpServletResponse, ErrorCode.INVALID_TOKEN, httpServletRequest);
+            return;
         } catch (Exception e) {
             log.error("Failed to validate JWT token", e);
             setErrorResponse(httpServletResponse, ErrorCode.INTERNAL_SERVER_ERROR, httpServletRequest);
