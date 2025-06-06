@@ -33,7 +33,7 @@ public class MemberController {
     private final EmailAuthService emailAuthService;
 
     @PostMapping("/signup")
-    public ResponseEntity<CommonResponseDto<String>> signup(@Valid @RequestBody SignupRequestDto signupRequestDto) {
+    public ResponseEntity<CommonResponseDto<Void>> signup(@Valid @RequestBody SignupRequestDto signupRequestDto) {
 
         if (!emailAuthService.isVerified(signupRequestDto.getEmail())) {
             throw new CustomException(ErrorCode.EMAIL_NOT_VERIFIED);
@@ -48,13 +48,18 @@ public class MemberController {
 
     @PostMapping("/login")
     public ResponseEntity<CommonResponseDto<LoginResponseDto>> login(@Valid @RequestBody LoginRequestDto loginRequestDto) {
-        return ResponseEntity.ok(memberService.login(loginRequestDto));
+        LoginResponseDto loginResponseDto = memberService.login(loginRequestDto);
+
+        return ResponseEntity.ok(CommonResponseDto.success(SuccessCode.LOGIN_SUCCESS, loginResponseDto));
     }
 
     @PostMapping("/logout")
-    public ResponseEntity<CommonResponseDto<String>> logout(HttpServletRequest httpServletRequest) {
+    public ResponseEntity<CommonResponseDto<Void>> logout(HttpServletRequest httpServletRequest) {
         String token = resolveToken(httpServletRequest);
-        return ResponseEntity.ok(memberService.logout(token));
+
+        memberService.logout(token);
+
+        return ResponseEntity.ok(CommonResponseDto.success(SuccessCode.LOGOUT_SUCCESS, null));
     }
 
     private String resolveToken(HttpServletRequest httpServletRequest) {
@@ -70,10 +75,12 @@ public class MemberController {
     }
 
     @PatchMapping("/password")
-    public ResponseEntity<CommonResponseDto<String>> changePassword(HttpServletRequest httpServletRequest,
-                                                                    @Valid @RequestBody ChangePasswordRequestDto changePasswordRequestDto) {
+    public ResponseEntity<CommonResponseDto<Void>> changePassword(HttpServletRequest httpServletRequest,
+                                                                  @Valid @RequestBody ChangePasswordRequestDto changePasswordRequestDto) {
         String token = resolveToken(httpServletRequest);
 
-        return ResponseEntity.ok(memberService.changePassword(token, changePasswordRequestDto));
+        memberService.changePassword(token, changePasswordRequestDto);
+
+        return ResponseEntity.ok(CommonResponseDto.success(SuccessCode.PASSWORD_CHANGE_SUCCESS, null));
     }
 }

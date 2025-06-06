@@ -6,8 +6,6 @@ import com.example.career.domain.member.dto.LoginResponseDto;
 import com.example.career.domain.member.dto.SignupRequestDto;
 import com.example.career.domain.member.entity.Member;
 import com.example.career.domain.member.repository.MemberRepository;
-import com.example.career.global.common.CommonResponseDto;
-import com.example.career.global.common.SuccessCode;
 import com.example.career.global.error.errorcode.ErrorCode;
 import com.example.career.global.error.exception.BadRequestException;
 import com.example.career.global.jwt.JwtProvider;
@@ -32,7 +30,7 @@ public class MemberService {
     private final RedisTemplate<String, String> blacklistRedisTemplate;
 
     @Transactional
-    public CommonResponseDto<String> signup(SignupRequestDto signupRequestDto) {
+    public void signup(SignupRequestDto signupRequestDto) {
         if (memberRepository.existsByEmail(signupRequestDto.getEmail())) {
             throw new BadRequestException(ErrorCode.DUPLICATE_EMAIL);
         }
@@ -40,11 +38,9 @@ public class MemberService {
         String encodedPassword = passwordEncoder.encode(signupRequestDto.getPassword());
         Member member = signupRequestDto.toEntity(encodedPassword);
         memberRepository.save(member);
-
-        return CommonResponseDto.success(SuccessCode.SIGNUP_SUCCESS, null);
     }
 
-    public CommonResponseDto<LoginResponseDto> login(LoginRequestDto loginRequestDto) {
+    public LoginResponseDto login(LoginRequestDto loginRequestDto) {
         Member member = memberRepository.findByEmail(loginRequestDto.getEmail())
                 .orElseThrow(() -> new BadRequestException(ErrorCode.MEMBER_NOT_FOUND));
 
@@ -55,11 +51,11 @@ public class MemberService {
         String accessToken = jwtProvider.generateAccessToken(member.getEmail());
         String refreshToken = jwtProvider.generateRefreshToken(member.getEmail());
 
-        return CommonResponseDto.success(SuccessCode.LOGIN_SUCCESS, new LoginResponseDto(accessToken, refreshToken));
+        return new LoginResponseDto(accessToken, refreshToken);
     }
 
     @Transactional
-    public CommonResponseDto<String> logout(String accessToken) {
+    public void logout(String accessToken) {
         if (accessToken == null) {
             throw new BadRequestException(ErrorCode.INVALID_TOKEN);
         }
@@ -68,11 +64,10 @@ public class MemberService {
 
         long expiration = jwtProvider.getExpiration(accessToken);
         blacklistRedisTemplate.opsForValue().set(accessToken, "logout", expiration, TimeUnit.MILLISECONDS);
-
-        return CommonResponseDto.success(SuccessCode.LOGOUT_SUCCESS, null);
     }
 
-    public CommonResponseDto<String> changePassword(String token, ChangePasswordRequestDto changePasswordRequestDto) {
+    @Transactional
+    public void changePassword(String token, ChangePasswordRequestDto changePasswordRequestDto) {
 
         String email = jwtProvider.getUsernameFromToken(token);
 
@@ -85,8 +80,6 @@ public class MemberService {
 
         String newEncodedPassword = passwordEncoder.encode(changePasswordRequestDto.getNewPassword());
         member.updatePassword(newEncodedPassword);
-
-        return CommonResponseDto.success(SuccessCode.PASSWORD_CHANGE_SUCCESS, null);
     }
 
 }
