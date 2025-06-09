@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { router } from 'expo-router';
 import {
   SafeAreaView,
@@ -14,14 +14,61 @@ import {
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { login } from '@/api/Auth';
 import axios from 'axios';
+import * as AuthSession from 'expo-auth-session';
 
 const API = process.env.EXPO_PUBLIC_API_BASE_URL;
+const KAKAO_CLIENT_ID = process.env.EXPO_PUBLIC_KAKAO_REST_API_KEY!;
+
+const discovery = {
+  authorizationEndpoint: 'https://kauth.kakao.com/oauth/authorize',
+  tokenEndpoint: 'https://kauth.kakao.com/oauth/token',
+};
 
 export default function LoginScreen() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [autoLoginChecked, setAutoLoginChecked] = useState(false);
+
+  const redirectUri = AuthSession.makeRedirectUri({
+    scheme: 'careeroom',
+    preferLocalhost: true,
+  });
+
+  const [request, response, promptAsync] = AuthSession.useAuthRequest(
+    {
+      clientId: KAKAO_CLIENT_ID,
+      redirectUri,
+      responseType: AuthSession.ResponseType.Code,
+    },
+    discovery
+  );
+
+  useEffect(() => {
+    const handleKakaoCode = async () => {
+      if (response?.type === 'success' && response.params.code) {
+        try {
+          const code = response.params.code;
+          const res = await axios.get(`${API}/api/auth/kakao/callback?code=${code}`);
+          const { accessToken, refreshToken } = res.data.data;
+
+          await AsyncStorage.setItem('accessToken', accessToken);
+          await AsyncStorage.setItem('refreshToken', refreshToken);
+
+          const onboardingRes = await axios.get(`${API}/api/onboarding/completed`, {
+            headers: { Authorization: `Bearer ${accessToken}` },
+          });
+
+          const isCompleted = onboardingRes.data.data.completed;
+          router.replace(isCompleted ? '/(tabs)/studyroom' : '/onboarding/StartScreen');
+        } catch (error) {
+          Alert.alert('카카오 로그인 실패', '토큰 발급에 실패했습니다.');
+        }
+      }
+    };
+
+    handleKakaoCode();
+  }, [response]);
 
   const handleLogin = async () => {
     try {
@@ -160,7 +207,7 @@ export default function LoginScreen() {
             <View style={styles.line} />
           </View>
 
-          <TouchableOpacity style={styles.kakaoButton}>
+          <TouchableOpacity style={styles.kakaoButton} onPress={() => promptAsync()}>
             <Image
               source={require('@/assets/images/icon-kakao-36.png')}
               style={styles.kakaoIcon}

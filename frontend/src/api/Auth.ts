@@ -60,3 +60,13 @@ export async function login({ email, password }: LoginRequest) {
     throw error;
   }
 }
+
+export async function kakaoLogin(code: string) {
+  try {
+    const response = await axios.get(`${API}/api/auth/kakao/callback?code=${code}`);
+    return response.data.data;
+  } catch (error: any) {
+    console.error('카카오 로그인 실패:', error.response?.data || error.message);
+    throw error;
+  }
+}
