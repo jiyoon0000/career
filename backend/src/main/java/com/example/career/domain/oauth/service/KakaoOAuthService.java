@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.reactive.function.BodyInserters;
@@ -41,6 +42,7 @@ public class KakaoOAuthService {
     @Value("${kakao.user-info-uri}")
     private String userInfoUri;
 
+    @Transactional
     public LoginResponseDto kakaoLogin(String code) {
         KakaoTokenResponse tokenResponse = getAccessToken(code);
         KakaoUserInfo userInfo = getUserInfo(tokenResponse.getAccessToken());
