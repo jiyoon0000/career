@@ -11,7 +11,7 @@ export default function KakaoCallbackPage() {
       axios
         .get(`https://api.careeroom.net/api/auth/kakao/callback?code=${code}`)
         .then((res) => {
-          const { accessToken, refreshToken } = res.data;
+          const { accessToken, refreshToken } = res.data.data;
           localStorage.setItem('accessToken', accessToken);
           localStorage.setItem('refreshToken', refreshToken);
           router.replace('/tabs');

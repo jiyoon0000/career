@@ -30,10 +30,7 @@ export default function LoginScreen() {
   const [showPassword, setShowPassword] = useState(false);
   const [autoLoginChecked, setAutoLoginChecked] = useState(false);
 
-  const redirectUri = AuthSession.makeRedirectUri({
-    scheme: 'careeroom',
-    preferLocalhost: true,
-  });
+  const redirectUri = 'https://careeroom.net/oauth/kakao/callback';
 
   const [request, response, promptAsync] = AuthSession.useAuthRequest(
     {
