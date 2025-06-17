@@ -91,4 +91,14 @@ public class JwtProvider {
     public void validateTokenOrThrow(String token) {
         getClaims(token);
     }
+
+    public boolean validateToken(String token) {
+        try {
+            getClaims(token);
+            return true;
+        } catch (Exception e) {
+            log.warn("유효하지 않은 JWT 토큰: {}", e.getMessage());
+            return false;
+        }
+    }
 }

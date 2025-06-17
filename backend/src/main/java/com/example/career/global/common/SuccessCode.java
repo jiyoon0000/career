@@ -17,7 +17,9 @@ public enum SuccessCode {
     DELETE_SUCCESS("성공적으로 삭제되었습니다."),
 
     EMAIL_SEND_SUCCESS("인증코드를 성공적으로 전송했습니다."),
-    EMAIL_VERIFY_SUCCESS("이메일 인증이 완료되었습니다.");
+    EMAIL_VERIFY_SUCCESS("이메일 인증이 완료되었습니다."),
+
+    TOKEN_REISSUE_SUCCESS("토큰 재발급 성공");
 
     private final String message;
 }

@@ -4,6 +4,7 @@ import com.example.career.domain.member.dto.ChangePasswordRequestDto;
 import com.example.career.domain.member.dto.LoginRequestDto;
 import com.example.career.domain.member.dto.LoginResponseDto;
 import com.example.career.domain.member.dto.SignupRequestDto;
+import com.example.career.domain.member.dto.TokenReissueRequestDto;
 import com.example.career.domain.member.service.MemberService;
 import com.example.career.global.auth.service.EmailAuthService;
 import com.example.career.global.common.CommonResponseDto;
@@ -72,6 +73,13 @@ public class MemberController {
         }
 
         return null;
+    }
+
+    @PostMapping("/refresh")
+    public ResponseEntity<CommonResponseDto<LoginResponseDto>> refresh(@Valid @RequestBody TokenReissueRequestDto tokenReissueRequestDto) {
+        LoginResponseDto loginResponseDto = memberService.reissueToken(tokenReissueRequestDto.getRefreshToken());
+
+        return ResponseEntity.ok(CommonResponseDto.success(SuccessCode.TOKEN_REISSUE_SUCCESS, loginResponseDto));
     }
 
     @PatchMapping("/password")
