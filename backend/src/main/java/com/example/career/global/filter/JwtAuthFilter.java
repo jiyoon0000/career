@@ -6,6 +6,7 @@ import com.example.career.global.error.errorcode.ErrorCode;
 import com.example.career.global.error.response.ErrorResponse;
 import com.example.career.global.jwt.JwtProvider;
 import com.example.career.global.security.MemberDetails;
+import com.example.career.global.util.RedisUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
@@ -32,6 +33,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
     private final JwtProvider jwtProvider;
     private final MemberRepository memberRepository;
+    private final RedisUtil redisUtil;
 
     @Override
     protected void doFilterInternal(HttpServletRequest httpServletRequest,
@@ -52,6 +54,13 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                 if (member == null) {
                     log.warn("Member Not Found: {}", email);
                     setErrorResponse(httpServletResponse, ErrorCode.MEMBER_NOT_FOUND, httpServletRequest);
+                    return;
+                }
+
+                String storedAccessToken = redisUtil.getAccessToken(member.getId());
+                if (storedAccessToken != null && !storedAccessToken.equals(token)) {
+                    log.warn("AccessToken mismatch: 다른 기기에서 로그인 되었습니다.");
+                    setErrorResponse(httpServletResponse, ErrorCode.DUPLICATE_LOGIN_DETECTED, httpServletRequest);
                     return;
                 }
 

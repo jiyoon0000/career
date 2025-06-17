@@ -54,7 +54,10 @@ public class MemberService {
         String refreshToken = jwtProvider.generateRefreshToken(member.getEmail());
 
         long refreshTokenExpiry = jwtProvider.getRefreshTokenExpiry();
+        long accessTokenExpiry = jwtProvider.getRefreshTokenExpiry();
+
         redisUtil.saveRefreshToken(member.getId(), refreshToken, refreshTokenExpiry);
+        redisUtil.saveAccessToken(member.getId(), accessToken, accessTokenExpiry);
 
         return new LoginResponseDto(accessToken, refreshToken);
     }
@@ -72,6 +75,7 @@ public class MemberService {
                 .orElseThrow(() -> new BadRequestException(ErrorCode.MEMBER_NOT_FOUND));
 
         redisUtil.deleteRefreshToken(member.getId());
+        redisUtil.deleteAccessToken(member.getId());
 
         long expiration = jwtProvider.getExpiration(accessToken);
         blacklistRedisTemplate.opsForValue().set(accessToken, "logout", expiration, TimeUnit.MILLISECONDS);

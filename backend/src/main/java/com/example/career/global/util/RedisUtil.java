@@ -26,4 +26,19 @@ public class RedisUtil {
         String key = "refreshToken:" + memberId;
         redisTemplate.delete(key);
     }
+
+    public void saveAccessToken(Long memberId, String token, long expirationMillis) {
+        String key = "accessToken:" + memberId;
+        redisTemplate.opsForValue().set(key, token, expirationMillis, TimeUnit.MILLISECONDS);
+    }
+
+    public String getAccessToken(Long memberId) {
+        String key = "accessToken:" + memberId;
+        return redisTemplate.opsForValue().get(key);
+    }
+
+    public void deleteAccessToken(Long memberId) {
+        String key = "accessToken:" + memberId;
+        redisTemplate.delete(key);
+    }
 }

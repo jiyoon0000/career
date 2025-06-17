@@ -3,6 +3,7 @@ package com.example.career.global.config;
 import com.example.career.domain.member.repository.MemberRepository;
 import com.example.career.global.filter.JwtAuthFilter;
 import com.example.career.global.jwt.JwtProvider;
+import com.example.career.global.util.RedisUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -27,6 +28,7 @@ public class SecurityConfig {
 
     private final JwtProvider jwtProvider;
     private final MemberRepository memberRepository;
+    private final RedisUtil redisUtil;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
@@ -50,7 +52,7 @@ public class SecurityConfig {
                         ).permitAll()
                         .anyRequest().authenticated()
                 )
-                .addFilterBefore(new JwtAuthFilter(jwtProvider, memberRepository), UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(new JwtAuthFilter(jwtProvider, memberRepository, redisUtil), UsernamePasswordAuthenticationFilter.class)
                 .build();
     }
 
