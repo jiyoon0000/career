@@ -9,6 +9,7 @@ import com.example.career.domain.member.repository.MemberRepository;
 import com.example.career.global.error.errorcode.ErrorCode;
 import com.example.career.global.error.exception.BadRequestException;
 import com.example.career.global.jwt.JwtProvider;
+import com.example.career.global.util.RedisUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -25,6 +26,7 @@ public class MemberService {
     private final MemberRepository memberRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtProvider jwtProvider;
+    private final RedisUtil redisUtil;
 
     @Qualifier("blacklistRedisTemplate")
     private final RedisTemplate<String, String> blacklistRedisTemplate;
@@ -51,6 +53,12 @@ public class MemberService {
         String accessToken = jwtProvider.generateAccessToken(member.getEmail());
         String refreshToken = jwtProvider.generateRefreshToken(member.getEmail());
 
+        long refreshTokenExpiry = jwtProvider.getRefreshTokenExpiry();
+        long accessTokenExpiry = jwtProvider.getRefreshTokenExpiry();
+
+        redisUtil.saveRefreshToken(member.getId(), refreshToken, refreshTokenExpiry);
+        redisUtil.saveAccessToken(member.getId(), accessToken, accessTokenExpiry);
+
         return new LoginResponseDto(accessToken, refreshToken);
     }
 
@@ -61,6 +69,13 @@ public class MemberService {
         }
 
         jwtProvider.validateTokenOrThrow(accessToken);
+
+        String email = jwtProvider.getUsernameFromToken(accessToken);
+        Member member = memberRepository.findByEmail(email)
+                .orElseThrow(() -> new BadRequestException(ErrorCode.MEMBER_NOT_FOUND));
+
+        redisUtil.deleteRefreshToken(member.getId());
+        redisUtil.deleteAccessToken(member.getId());
 
         long expiration = jwtProvider.getExpiration(accessToken);
         blacklistRedisTemplate.opsForValue().set(accessToken, "logout", expiration, TimeUnit.MILLISECONDS);
@@ -80,6 +95,30 @@ public class MemberService {
 
         String newEncodedPassword = passwordEncoder.encode(changePasswordRequestDto.getNewPassword());
         member.updatePassword(newEncodedPassword);
+    }
+
+    public LoginResponseDto reissueToken(String refreshToken) {
+        if (!jwtProvider.validateToken(refreshToken)) {
+            throw new BadRequestException(ErrorCode.INVALID_REFRESH_TOKEN);
+        }
+
+        String email = jwtProvider.getUsernameFromToken(refreshToken);
+
+        Member member = memberRepository.findByEmail(email)
+                .orElseThrow(() -> new BadRequestException(ErrorCode.MEMBER_NOT_FOUND));
+
+        String savedRefreshToken = redisUtil.getRefreshToken(member.getId());
+
+        if (savedRefreshToken == null || !savedRefreshToken.equals(refreshToken)) {
+            throw new BadRequestException(ErrorCode.DUPLICATE_LOGIN_DETECTED);
+        }
+
+        String newAccessToken = jwtProvider.generateAccessToken(email);
+        String newRefreshToken = jwtProvider.generateRefreshToken(email);
+
+        redisUtil.saveRefreshToken(member.getId(), newRefreshToken, jwtProvider.getRefreshTokenExpiry());
+
+        return new LoginResponseDto(newAccessToken, newRefreshToken);
     }
 
 }
