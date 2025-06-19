@@ -18,6 +18,7 @@ public enum SuccessCode {
 
     EMAIL_SEND_SUCCESS("인증코드를 성공적으로 전송했습니다."),
     EMAIL_VERIFY_SUCCESS("이메일 인증이 완료되었습니다."),
+    PASSWORD_RESET_SUCCESS("비밀번호 재설정 완료"),
 
     TOKEN_REISSUE_SUCCESS("토큰 재발급 성공");
 

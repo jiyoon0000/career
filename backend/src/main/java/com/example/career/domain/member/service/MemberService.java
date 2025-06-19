@@ -6,8 +6,10 @@ import com.example.career.domain.member.dto.LoginResponseDto;
 import com.example.career.domain.member.dto.SignupRequestDto;
 import com.example.career.domain.member.entity.Member;
 import com.example.career.domain.member.repository.MemberRepository;
+import com.example.career.global.auth.service.EmailAuthService;
 import com.example.career.global.error.errorcode.ErrorCode;
 import com.example.career.global.error.exception.BadRequestException;
+import com.example.career.global.error.exception.CustomException;
 import com.example.career.global.jwt.JwtProvider;
 import com.example.career.global.util.RedisUtil;
 import lombok.RequiredArgsConstructor;
@@ -27,6 +29,7 @@ public class MemberService {
     private final PasswordEncoder passwordEncoder;
     private final JwtProvider jwtProvider;
     private final RedisUtil redisUtil;
+    private final EmailAuthService emailAuthService;
 
     @Qualifier("blacklistRedisTemplate")
     private final RedisTemplate<String, String> blacklistRedisTemplate;
@@ -121,4 +124,35 @@ public class MemberService {
         return new LoginResponseDto(newAccessToken, newRefreshToken);
     }
 
+    @Transactional
+    public void sendPasswordResetCode(String email) {
+        if (!memberRepository.existsByEmail(email)) {
+            throw new CustomException(ErrorCode.MEMBER_NOT_FOUND);
+        }
+        emailAuthService.sendAuthCode(email);
+    }
+
+    @Transactional
+    public void verifyPasswordResetCode(String email, String code) {
+        emailAuthService.verifyAuthCode(email, code);
+    }
+
+    @Transactional
+    public void resetPassword(String email, String newPassword) {
+        if (!emailAuthService.isVerified(email)) {
+            throw new CustomException(ErrorCode.EMAIL_NOT_VERIFIED);
+        }
+        
+        Member member = memberRepository.findByEmail(email)
+                .orElseThrow(() -> new BadRequestException(ErrorCode.MEMBER_NOT_FOUND));
+
+        if (passwordEncoder.matches(newPassword, member.getPassword())) {
+            throw new CustomException(ErrorCode.SAME_AS_OLD_PASSWORD);
+        }
+
+        String encodedPassword = passwordEncoder.encode(newPassword);
+        member.updatePassword(encodedPassword);
+
+        emailAuthService.clearVerifiedFlag(email);
+    }
 }
