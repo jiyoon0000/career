@@ -28,8 +28,8 @@ public class AuthController {
 
     @PostMapping("/verify")
     public ResponseEntity<CommonResponseDto<Boolean>> verifyCode(@RequestBody EmailVerifyDto emailVerifyDto) {
-        boolean result = emailAuthService.verifyAuthCode(emailVerifyDto.getEmail(), emailVerifyDto.getCode());
+        emailAuthService.verifyAuthCode(emailVerifyDto.getEmail(), emailVerifyDto.getCode());
 
-        return ResponseEntity.ok(CommonResponseDto.success(SuccessCode.EMAIL_VERIFY_SUCCESS, result));
+        return ResponseEntity.ok(CommonResponseDto.success(SuccessCode.EMAIL_VERIFY_SUCCESS, null));
     }
 }

@@ -3,8 +3,12 @@ package com.example.career.domain.member.controller;
 import com.example.career.domain.member.dto.ChangePasswordRequestDto;
 import com.example.career.domain.member.dto.LoginRequestDto;
 import com.example.career.domain.member.dto.LoginResponseDto;
+import com.example.career.domain.member.dto.PasswordResetEmailRequestDto;
+import com.example.career.domain.member.dto.PasswordResetRequestDto;
+import com.example.career.domain.member.dto.PasswordResetVerifyRequestDto;
 import com.example.career.domain.member.dto.SignupRequestDto;
 import com.example.career.domain.member.dto.TokenReissueRequestDto;
+import com.example.career.domain.member.repository.MemberRepository;
 import com.example.career.domain.member.service.MemberService;
 import com.example.career.global.auth.service.EmailAuthService;
 import com.example.career.global.common.CommonResponseDto;
@@ -32,6 +36,7 @@ public class MemberController {
 
     private final MemberService memberService;
     private final EmailAuthService emailAuthService;
+    private final MemberRepository memberRepository;
 
     @PostMapping("/signup")
     public ResponseEntity<CommonResponseDto<Void>> signup(@Valid @RequestBody SignupRequestDto signupRequestDto) {
@@ -80,6 +85,27 @@ public class MemberController {
         LoginResponseDto loginResponseDto = memberService.reissueToken(tokenReissueRequestDto.getRefreshToken());
 
         return ResponseEntity.ok(CommonResponseDto.success(SuccessCode.TOKEN_REISSUE_SUCCESS, loginResponseDto));
+    }
+
+    @PostMapping("/password/reset/send")
+    public ResponseEntity<CommonResponseDto<Void>> sendResetCode(@Valid @RequestBody PasswordResetEmailRequestDto passwordResetEmailRequestDto) {
+        memberService.sendPasswordResetCode(passwordResetEmailRequestDto.getEmail());
+
+        return ResponseEntity.ok(CommonResponseDto.success(SuccessCode.EMAIL_SEND_SUCCESS, null));
+    }
+
+    @PostMapping("/password/reset/verify")
+    public ResponseEntity<CommonResponseDto<Void>> verifyResetCode(@Valid @RequestBody PasswordResetVerifyRequestDto passwordResetVerifyRequestDto) {
+        memberService.verifyPasswordResetCode(passwordResetVerifyRequestDto.getEmail(), passwordResetVerifyRequestDto.getCode());
+
+        return ResponseEntity.ok(CommonResponseDto.success(SuccessCode.EMAIL_VERIFY_SUCCESS, null));
+    }
+
+    @PostMapping("/password/reset/confirm")
+    public ResponseEntity<CommonResponseDto<Void>> resetPassword(@Valid @RequestBody PasswordResetRequestDto passwordResetRequestDto) {
+        memberService.resetPassword(passwordResetRequestDto.getEmail(), passwordResetRequestDto.getNewPassword());
+
+        return ResponseEntity.ok(CommonResponseDto.success(SuccessCode.PASSWORD_RESET_SUCCESS, null));
     }
 
     @PatchMapping("/password")

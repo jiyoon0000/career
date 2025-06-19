@@ -17,12 +17,15 @@ public enum ErrorCode {
     INVALID_SKILL_COUNT(HttpStatus.BAD_REQUEST, "스킬은 최소 1개 이상, 최대 10개까지 선택할 수 있습니다."),
     EMAIL_NOT_VERIFIED(HttpStatus.BAD_REQUEST, "이메일 인증이 완료되지 않았습니다."),
     DUPLICATE_LOGIN_DETECTED(HttpStatus.BAD_REQUEST, "다른 기기에서 로그인되어 자동 로그아웃 되었습니다."),
+    SAME_AS_OLD_PASSWORD(HttpStatus.BAD_REQUEST, "이전과 동일한 비밀번호는 사용할 수 없습니다."),
 
     // NOT_FOUND
     MEMBER_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 회원을 찾을 수 없습니다."),
     JOB_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 직업을 찾을 수 없습니다."),
     ONBOARDING_NOT_FOUND(HttpStatus.NOT_FOUND, "온보딩이 저장되지 않았습니다."),
     STUDY_ROOM_NOT_FOUND(HttpStatus.NOT_FOUND, "스터디룸이 존재하지 않습니다."),
+    EMAIL_AUTH_CODE_NOT_FOUND(HttpStatus.NOT_FOUND, "이메일 인증 코드가 존재하지 않습니다."),
+    EMAIL_AUTH_CODE_NOT_MATCH(HttpStatus.NOT_FOUND, "이메일 인증 코드가 일치하지 않습니다."),
 
     // CONFLICT
     DUPLICATE_EMAIL(HttpStatus.CONFLICT, "이미 존재하는 이메일입니다."),
